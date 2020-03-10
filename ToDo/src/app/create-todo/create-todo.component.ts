@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, FormBuilder } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
+import { ApiService } from '../api.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-create-todo',
@@ -16,19 +18,27 @@ export class CreateTodoComponent implements OnInit {
 
   submitted = false;
 
-  constructor() { 
-    
-  }
-
-  
+  constructor(private api: ApiService, private router: Router) { }
 
   ngOnInit(): void {
 
   }
 
-  onSubmit(){
+  onSubmit() {
     console.log(this.toDoForm.value);
     this.submitted = true;
+
+    this.api.createNewItem(localStorage.getItem('uid'), this.toDoForm.value)
+      .subscribe(
+        data => {
+          console.log(data);
+          this.router.navigate(['/']);
+        },
+        error => {
+          console.log(error);
+        }
+      );
+
   }
 
 }

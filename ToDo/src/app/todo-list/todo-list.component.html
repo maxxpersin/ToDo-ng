@@ -1,9 +1,11 @@
 <app-nav-bar></app-nav-bar>
-<div>
-    <h1>Your items</h1>
-    <div *ngFor="let toDo of toDoItems">
-        <div>{{toDo.title}}</div>
-        <div>{{toDo.date}}</div>
-        <div>{{toDo.description}}</div>
+<div class="container">
+    <div class="card">
+        <h1 class="card-header">Your items</h1>
+        <div class="card-body" *ngFor="let toDo of toDoItems">
+            <span>{{toDo.title}}</span>
+            <span>{{toDo.date}}</span>
+            <span>{{toDo.description}}</span>
+        </div>
     </div>
 </div>

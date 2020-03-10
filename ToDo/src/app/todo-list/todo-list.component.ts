@@ -18,14 +18,34 @@ export class TodoListComponent implements OnInit {
     this.getAuth();
   }
 
-  getToDoItems() {
-    //this.api.
+  getToDoItems(uid: string) {
+    this.api.getItems(uid)
+      .subscribe(
+        data => {
+          if (data.status == 400) {
+            localStorage.removeItem('uid');
+            this.getAuth();
+          } else {
+            this.toDoItems = data;
+          }
+        }, error => {
+          console.log(error);
+        }
+      );
   }
 
   getAuth() {
-    this.api.getAuth().subscribe( data => {
-      console.log(data);
-    });
-  }
+    let uid: string;
+    if (localStorage.getItem('uid')) {
+      uid = localStorage.getItem('uid');
+      this.getToDoItems(uid);
+      return;
+    }
 
+    this.api.getAuth().subscribe(data => {
+      localStorage.setItem('uid', data.id);
+      this.getToDoItems(data.id);
+    });
+
+  }
 }

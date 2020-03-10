@@ -1,0 +1,9 @@
+<app-nav-bar></app-nav-bar>
+<div>
+    <h1>Your items</h1>
+    <div *ngFor="let toDo of toDoItems">
+        <div>{{toDo.title}}</div>
+        <div>{{toDo.date}}</div>
+        <div>{{toDo.description}}</div>
+    </div>
+</div>

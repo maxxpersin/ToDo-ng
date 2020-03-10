@@ -13,10 +13,14 @@ app.use(cookieParser());
 
 //app.use(express.static('../ToDo'));
 
-app.get('/', (req, res) => {
-
-    res.send(200);
-
+app.get('/api/v1', (req, res) => {
+    console.log('endpoint hit');
+    user = createUser();
+    res.cookie('id', user.id);
+    res.header({
+        'Access-Control-Allow-Origin': '*',
+    });
+    res.json(user);
 });
 
 app.get('/api/v1/items/:uid', (req, res) => {

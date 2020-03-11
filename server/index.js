@@ -49,19 +49,12 @@ app.post('/api/v1/items/:uid', (req, res) => {
     res.json(item);
 });
 
-app.post('/api/v1/createitem', (req, res) => {
-    let newItem = req.body;
-    newItem.id = shortId.generate();
+app.get('/api/v1/items/:uid/:iid', (req, res) => {
 
-    users.forEach(user => {
-        if (user.id == req.cookies.id) {
-            user.items.push(newItem);
-        }
-    });
+    let user = findUser(req.params.uid);
 
-    console.log(users);
-
-    res.sendStatus(200);
+    console.log(user);
+    res.json(findItem(user, req.params.iid));
 });
 
 function createUser() {
@@ -74,6 +67,19 @@ function createUser() {
 
     users.push(user);
     return user;
+}
+
+function findItem(user, iid) {
+    let found;
+    user.items.forEach(item => {
+        if (item.id == iid) {
+            found = item;
+            return;
+        }
+    });
+
+    console.log(found);
+    return found;
 }
 
 function findUser(uid) {

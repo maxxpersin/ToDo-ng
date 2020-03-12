@@ -24,7 +24,11 @@ export class LoginComponent implements OnInit {
     this.api.login(this.loginForm.value)
       .subscribe(
         data => {
-          console.log(data);
+          this.api.user = data;
+
+          localStorage.setItem('user', JSON.stringify(data));
+
+          this.router.navigate(['']);
         },
         error => {
           console.log(error);

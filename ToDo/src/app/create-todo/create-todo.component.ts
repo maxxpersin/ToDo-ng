@@ -29,7 +29,7 @@ export class CreateTodoComponent implements OnInit {
     console.log(this.toDoForm.value);
     this.submitted = true;
 
-    this.api.createNewItem(localStorage.getItem('uid'), this.toDoForm.value)
+    this.api.createNewItem(this.toDoForm.value)
       .subscribe(
         data => {
           console.log(data);

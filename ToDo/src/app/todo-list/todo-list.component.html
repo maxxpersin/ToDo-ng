@@ -1,7 +1,10 @@
 <app-nav-bar></app-nav-bar>
 <div class="container">
     <div class="card">
-        <h1 class="card-header">Your items</h1>
+        <div class="card-header">
+            <h1 style="display: inline;">Your items</h1>
+            <button (click)="getToDoItems()" class="btn btn-primary float-right">Refresh</button>
+        </div>
         <div class="card-body">
             <table class="table">
                 <tr>

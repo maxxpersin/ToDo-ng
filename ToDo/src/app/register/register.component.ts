@@ -30,7 +30,7 @@ export class RegisterComponent implements OnInit {
         data => {
           //this.api.user = data;
           localStorage.setItem('user', JSON.stringify(data));
-          this.router.navigate(['']);
+          this.router.navigate(['/login']);
         },
         error => {
           alert('That email is already assigned to a user');

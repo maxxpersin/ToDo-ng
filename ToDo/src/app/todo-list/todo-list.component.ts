@@ -16,36 +16,20 @@ export class TodoListComponent implements OnInit {
 
   ngOnInit(): void {
     this.api.getUser();
+    if (this.api.user){
+      this.getToDoItems();
+    }
   }
 
-  getToDoItems(uid: string) {
-    // this.api.getItems(uid)
-    //   .subscribe(
-    //     data => {
-    //       if (data.status == 400) {
-    //         localStorage.removeItem('uid');
-    //         this.getAuth();
-    //       } else {
-    //         this.toDoItems = data;
-    //       }
-    //     }, error => {
-    //       console.log(error);
-    //     }
-    //   );
-  }
-
-  getAuth() {
-    // let uid: string;
-    // if (localStorage.getItem('uid')) {
-    //   uid = localStorage.getItem('uid');
-    //   this.getToDoItems(uid);
-    //   return;
-    // }
-
-    // this.api.getAuth().subscribe(data => {
-    //   localStorage.setItem('uid', data.id);
-    //   this.getToDoItems(data.id);
-    // });
-
+  getToDoItems() {
+    this.api.getItems(this.api.user.id)
+      .subscribe(
+        data => {
+          console.log(data);
+          this.toDoItems = data;
+        }, error => {
+          console.log(error);
+        }
+      );
   }
 }

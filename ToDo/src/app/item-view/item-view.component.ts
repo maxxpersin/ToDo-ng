@@ -16,18 +16,18 @@ export class ItemViewComponent implements OnInit {
   constructor(private api: ApiService, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
-    //this.id = this.route.snapshot.paramMap.get('id');
+    this.id = this.route.snapshot.paramMap.get('id');
 
-    // this.api.getItem(localStorage.getItem('uid'), this.id)
-    //   .subscribe(
-    //     data => {
-    //       this.item = data;
-    //       console.log(this.item);
-    //     },
-    //     error => {
-    //       console.log(error);
-    //     }
-    //   );
+    this.api.getItem(this.id)
+      .subscribe(
+        data => {
+          this.item = data;
+          console.log(this.item);
+        },
+        error => {
+          console.log(error);
+        }
+      );
   }
 
 }

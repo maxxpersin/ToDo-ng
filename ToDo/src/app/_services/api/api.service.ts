@@ -51,11 +51,11 @@ export class ApiService {
     return this.http.get<any>(`${this.config}/items/${uid}`)
   }
 
-  createNewItem(uid: string, formData: any): Observable<any> {
-    return this.http.post<any>(`${this.config}/items/${uid}`, formData);
+  createNewItem(formData: any): Observable<any> {
+    return this.http.post<any>(`${this.config}/items/${this.user.id}`, formData);
   }
 
-  getItem(uid: string, iid: string): Observable<any> {
-    return this.http.get<any>(`${this.config}/items/${uid}/${iid}`);
+  getItem(iid: string): Observable<any> {
+    return this.http.get<any>(`${this.config}/items/${this.user.id}/${iid}`);
   }
 }

@@ -3,6 +3,7 @@ const app = express();
 const shortId = require('shortid');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+
 const port = 3000;
 var users = [];
 var auth = [];
@@ -17,7 +18,6 @@ app.use(cors());
 //app.use(express.static('../ToDo'));
 
 app.post('/api/v1/register', (req, res) => {
-    //console.log(req.body);
     if (findUserByEmail(req.body.email)) {
         return res.sendStatus(403);
     }
@@ -26,9 +26,7 @@ app.post('/api/v1/register', (req, res) => {
 });
 
 app.post('/api/v1/login', (req, res) => {
-    console.log(users);
     let user = findUserByEmail(req.body.email);
-    //console.log(user);
     if (!user) {
         return res.sendStatus(403);
     }
@@ -46,32 +44,25 @@ app.post('/api/v1/login', (req, res) => {
 });
 
 app.get('/api/v1/items/:uid', (req, res) => {
-    if (req.params.uid) {
-        let userFound = false;
-        users.forEach(user => {
-            if (user.id == req.params.uid) {
-                userFound = true;
-            
-                res.json(user.items);
-                return;
-            }
-        });
-
-        if (userFound) {
-            return;
-        }
+    let userItems = findItems(req.params.uid);
+    if (userItems == 'undefined') {
+        return res.sendStatus(403);
     }
-    res.sendStatus(400);
+
+    return res.json(userItems.items);
 });
 
 app.post('/api/v1/items/:uid', (req, res) => {
     item = req.body;
     item.id = shortId.generate();
 
-    let user = findUser(req.params.uid);
-    user.items.push(item);
+    let userItems = findItems(req.params.uid);
+    if (userItems == 'undefined') {
+        return res.sendStatus(404);
+    }
+    userItems.items.push(item);
 
-    res.json(item);
+    return res.json(item);
 });
 
 app.get('/api/v1/items/:uid/:iid', (req, res) => {
@@ -79,7 +70,7 @@ app.get('/api/v1/items/:uid/:iid', (req, res) => {
     let user = findUser(req.params.uid);
 
     console.log(user);
-    res.json(findItem(user, req.params.iid));
+    res.json(findItem(user.id, req.params.iid));
 });
 
 function createUser(data) {
@@ -110,12 +101,16 @@ function createUser(data) {
     return user;
 }
 
-function findItem(user, iid) {
+function findItem(userId, iid) {
     let found;
-    user.items.forEach(item => {
-        if (item.id == iid) {
-            found = item;
-            return;
+    items.forEach(item => {
+        if (item.id == userId) {
+            item.items.forEach(i => {
+                if (i.id == iid) {
+                    found = i;
+                    return;
+                }
+            });
         }
     });
 
@@ -136,11 +131,21 @@ function findUser(uid) {
 }
 
 function findUserByEmail(email) {
-    let found ;
+    let found;
     users.forEach(user => {
-        console.log(user);
         if (user.email == email) {
             found = user;
+            return;
+        }
+    });
+    return found;
+}
+
+function findItems(id) {
+    let found;
+    items.forEach(item => {
+        if (item.id == id) {
+            found = item;
             return;
         }
     });
@@ -150,8 +155,8 @@ function findUserByEmail(email) {
 function findAuth(cred) {
     let found = false;
     auth.forEach(a => {
-        if (cred == a.id){
-            found = cred;
+        if (cred == a.id) {
+            found = a;
             return;
         }
     });

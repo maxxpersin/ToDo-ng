@@ -12,7 +12,7 @@
                         Login
                     </a>
                 </li>
-                <li *ngIf="this.user" class="nav-item active">
+                <li *ngIf="this.user" class="nav-item active" style="margin-left: 1em;">
                     <a (click)="logout()" class="nav-link btn btn-primary">Logout</a>
                 </li>
                 <li *ngIf="!this.user" class="nav-item active" style="margin-left: 1em;">

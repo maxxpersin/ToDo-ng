@@ -1,0 +1,15 @@
+<app-nav-bar></app-nav-bar>
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h1 style="display: inline;">{{item.title}}</h1>
+            <a class="btn btn-warning float-right" [routerLink]="['/item/edit/', item.id]">Edit</a>
+        </div>
+        <div class="card-body">
+            <h3>Complete By</h3>
+            <p>{{item.date}}</p>
+            <h3>Description</h3>
+            <p>{{item.description}}</p>
+        </div>
+    </div>
+</div>  

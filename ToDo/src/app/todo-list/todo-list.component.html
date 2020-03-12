@@ -2,10 +2,22 @@
 <div class="container">
     <div class="card">
         <h1 class="card-header">Your items</h1>
-        <div class="card-body" *ngFor="let toDo of toDoItems">
-            <span>{{toDo.title}}</span>
-            <span>{{toDo.date}}</span>
-            <span>{{toDo.description}}</span>
+        <div class="card-body">
+            <table class="table">
+                <tr>
+                    <th scope="col">Title</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Complete By</th>
+                </tr>
+                <tr [routerLink]="['/item/view/', toDo.id]" *ngFor=" let toDo of toDoItems" style="cursor: pointer;">
+                    <td>{{toDo.title}}</td>
+                    <td>{{toDo.description}}</td>
+                    <td>{{toDo.date}}</td>
+                </tr>
+            </table>
+        </div>
+        <div class="card-body" *ngIf="toDoItems.length == 0">
+            <p>You have nothing to do!</p>
         </div>
     </div>
 </div>

@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { ApiService } from '../api.service';
+import { ApiService } from '../_services/api/api.service';
 import { Router } from '@angular/router';
+import { Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-create-todo',
@@ -11,7 +12,7 @@ import { Router } from '@angular/router';
 export class CreateTodoComponent implements OnInit {
 
   toDoForm = new FormGroup({
-    title: new FormControl(''),
+    title: new FormControl('', [Validators.required]),
     date: new FormControl(''),
     description: new FormControl(''),
   });

@@ -8,13 +8,19 @@ import { TodoListComponent } from './todo-list/todo-list.component';
 import { CreateTodoComponent } from './create-todo/create-todo.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { ItemViewComponent } from './item-view/item-view.component';
+import { RegisterComponent } from './register/register.component';
+import { LoginComponent } from './login/login.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     NavBarComponent,
     TodoListComponent,
-    CreateTodoComponent
+    CreateTodoComponent,
+    ItemViewComponent,
+    RegisterComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,

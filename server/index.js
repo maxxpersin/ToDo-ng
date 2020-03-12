@@ -5,6 +5,8 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const port = 3000;
 var users = [];
+var auth = [];
+var items = []
 
 app.listen(port, () => console.log('ToDo App listening on port 3000'));
 
@@ -14,10 +16,33 @@ app.use(cookieParser());
 app.use(cors());
 //app.use(express.static('../ToDo'));
 
-app.get('/api/v1', (req, res) => {
-    console.log('endpoint hit');
-    user = createUser();
+app.post('/api/v1/register', (req, res) => {
+    //console.log(req.body);
+    if (findUserByEmail(req.body.email)) {
+        return res.sendStatus(403);
+    }
+    user = createUser(req.body);
     res.json(user);
+});
+
+app.post('/api/v1/login', (req, res) => {
+    console.log(users);
+    let user = findUserByEmail(req.body.email);
+    //console.log(user);
+    if (!user) {
+        return res.sendStatus(403);
+    }
+
+    let cred = findAuth(user.id);
+    if (!cred) {
+        return res.sendStatus(403);
+    }
+
+    if (cred.password == req.body.password) {
+        return res.json(user);
+    }
+
+    return res.sendStatus(403);
 });
 
 app.get('/api/v1/items/:uid', (req, res) => {
@@ -57,15 +82,31 @@ app.get('/api/v1/items/:uid/:iid', (req, res) => {
     res.json(findItem(user, req.params.iid));
 });
 
-function createUser() {
+function createUser(data) {
     let id = shortId.generate();
 
     let user = {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        id: id,
+    }
+
+    let cred = {
+        id: id,
+        password: data.password
+    }
+
+    let list = {
         id: id,
         items: []
-    };
+    }
 
     users.push(user);
+    auth.push(cred);
+    items.push(list);
+
+
     return user;
 }
 
@@ -91,5 +132,28 @@ function findUser(uid) {
         }
     });
 
+    return found;
+}
+
+function findUserByEmail(email) {
+    let found ;
+    users.forEach(user => {
+        console.log(user);
+        if (user.email == email) {
+            found = user;
+            return;
+        }
+    });
+    return found;
+}
+
+function findAuth(cred) {
+    let found = false;
+    auth.forEach(a => {
+        if (cred == a.id){
+            found = cred;
+            return;
+        }
+    });
     return found;
 }

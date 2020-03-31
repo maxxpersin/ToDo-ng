@@ -35,12 +35,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.post('/api/v1/register', (req, res) => {
-    if (findUserByEmail(req.body.email)) {
-        return res.sendStatus(403);
+app.post('/api/v1/register', async (req, res) => {
+    let user = await findUserByEmail(req.body.email);
+    if (user) {
+        return res.status(406).json('Email already exists');
     }
-    user = createUser(req.body);
-    res.json(user);
+    await createUser(req.body);
+    return res.sendStatus(200);
 });
 
 app.post('/api/v1/login', async (req, res) => {
@@ -76,6 +77,10 @@ app.post('/api/v1/login', async (req, res) => {
     // return res.sendStatus(403);
 });
 
+app.post('/api/v1/logout', async (req, res) => {
+
+});
+
 app.get('/api/v1/items/:uid', (req, res) => {
     let userItems = findItems(req.params.uid);
     if (userItems == 'undefined') {
@@ -106,32 +111,36 @@ app.get('/api/v1/items/:uid/:iid', (req, res) => {
     res.json(findItem(user.id, req.params.iid));
 });
 
-function createUser(data) {
+async function createUser(data) {
     let id = shortId.generate();
-
-    let user = {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        id: id,
+    try {
+        await client.query(`INSERT INTO public."User"("UserId", "FirstName", "LastName", "Password", "Email")
+        VALUES ('${id}', '${data.firstName}', '${data.lastName}', '${data.password}', '${data.email}');`);
+    } catch (err) {
+        return err;
     }
 
-    let cred = {
-        id: id,
-        password: data.password
-    }
+    // let user = {
+    //     firstName: data.firstName,
+    //     lastName: data.lastName,
+    //     email: data.email,
+    //     id: id,
+    // }
 
-    let list = {
-        id: id,
-        items: []
-    }
+    // let cred = {
+    //     id: id,
+    //     password: data.password
+    // }
 
-    users.push(user);
-    auth.push(cred);
-    items.push(list);
+    // let list = {
+    //     id: id,
+    //     items: []
+    // }
 
+    // users.push(user);
+    // auth.push(cred);
+    // items.push(list);
 
-    return user;
 }
 
 function findItem(userId, iid) {

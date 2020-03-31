@@ -12,12 +12,17 @@ const client = new PostgresClient({
     port: 5432,
     database: 'todo'
 });
-client.connect() // test query
-    .then(() => console.log('Conncetion Successful'))
-    .then(() => client.query('select "User"."FirstName" from public."User"'))
-    .then((data) => console.table(data.rows))
-    .catch(err => console.log(err))
-    .finally(() => client.end())
+client.connect(err => {
+    if (err) console.log('Could not connect', err);
+
+    console.log('Postgres connection successful')
+});
+
+// client.query('select * from public."User"', (err, res) => {
+//     if (err) console.log(err);
+
+//     console.log(res.rows);
+// })
 
 const port = 3000;
 var users = [];
@@ -38,22 +43,37 @@ app.post('/api/v1/register', (req, res) => {
     res.json(user);
 });
 
-app.post('/api/v1/login', (req, res) => {
-    let user = findUserByEmail(req.body.email);
+app.post('/api/v1/login', async (req, res) => {
+    let user = await findUserByEmail(req.body.email);
+
     if (!user) {
-        return res.sendStatus(403);
+        return res.status(406).json('User not found');
     }
+    if (user.Password == req.body.password) {
+        let cleanUser = {
+            id: user.UserId,
+            name: `${user.FirstName} ${user.LastName}`,
+            email: user.Email
+        };
 
-    let cred = findAuth(user.id);
-    if (!cred) {
-        return res.sendStatus(403);
+        return res.json(cleanUser);
+    } else {
+        return res.status(406).json('Invalid password');
     }
+    // if (!user) {
+    //     return res.sendStatus(403);
+    // }
 
-    if (cred.password == req.body.password) {
-        return res.json(user);
-    }
+    // let cred = findAuth(user.id);
+    // if (!cred) {
+    //     return res.sendStatus(403);
+    // }
 
-    return res.sendStatus(403);
+    // if (cred.password == req.body.password) {
+    //     return res.json(user);
+    // }
+
+    // return res.sendStatus(403);
 });
 
 app.get('/api/v1/items/:uid', (req, res) => {
@@ -143,15 +163,23 @@ function findUser(uid) {
     return found;
 }
 
-function findUserByEmail(email) {
-    let found;
-    users.forEach(user => {
-        if (user.email == email) {
-            found = user;
-            return;
-        }
-    });
-    return found;
+async function findUserByEmail(email) {
+    try {
+        let user = await client.query(`select * from public."User" where "User"."Email" = '${email}'`);
+        return user.rows[0];
+    } catch (err) {
+        return null;
+    }
+
+
+    // let found;
+    // users.forEach(user => {
+    //     if (user.email == email) {
+    //         found = user;
+    //         return;
+    //     }
+    // });
+    // return found;
 }
 
 function findItems(id) {

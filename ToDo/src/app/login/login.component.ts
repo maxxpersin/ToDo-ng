@@ -24,7 +24,7 @@ export class LoginComponent implements OnInit {
     this.api.login(this.loginForm.value)
       .subscribe(
         data => {
-          this.api.user = data;
+          this.api.user.next(data);
 
           localStorage.setItem('user', JSON.stringify(data));
 

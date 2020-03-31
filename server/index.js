@@ -2,7 +2,22 @@ const express = require('express');
 const app = express();
 const shortId = require('shortid');
 const cookieParser = require('cookie-parser');
-const cors = require('cors');
+
+// db connection
+const PostgresClient = require('pg').Client;
+const client = new PostgresClient({
+    user: 'postgres',
+    password: 'admin',
+    host: 'localhost',
+    port: 5432,
+    database: 'todo'
+});
+client.connect() // test query
+    .then(() => console.log('Conncetion Successful'))
+    .then(() => client.query('select "User"."FirstName" from public."User"'))
+    .then((data) => console.table(data.rows))
+    .catch(err => console.log(err))
+    .finally(() => client.end())
 
 const port = 3000;
 var users = [];
@@ -14,8 +29,6 @@ app.listen(port, () => console.log('ToDo App listening on port 3000'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(cors());
-//app.use(express.static('../ToDo'));
 
 app.post('/api/v1/register', (req, res) => {
     if (findUserByEmail(req.body.email)) {

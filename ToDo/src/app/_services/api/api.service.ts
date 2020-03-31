@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { ToDoItem } from '../../to-do-item';
 import { User } from '../../_models/user/user';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -10,11 +10,11 @@ import { Router, ActivatedRoute } from '@angular/router';
 })
 export class ApiService {
 
-  config = 'http://localhost:3000/api/v1';
-  user: User;
+  config = 'api/v1';
+  user: BehaviorSubject<User>;
 
   constructor(private http: HttpClient, private router: Router, private activatedRoute: ActivatedRoute) {
-    this.getUser();
+    this.user = new BehaviorSubject<User>(JSON.parse(localStorage.getItem('user')));
   }
 
   getAuth(): Observable<any> {
@@ -22,13 +22,7 @@ export class ApiService {
   }
 
   getUser() {
-    if (localStorage.getItem('user')) {
-      this.user = JSON.parse(localStorage.getItem('user'));
-      //window.location.reload();
-    }
-    if (!this.user) {
-      this.router.navigate(['/']);
-    }
+    return this.user.value;
   }
 
   registerUser(newUser: any): Observable<any> {
@@ -36,7 +30,7 @@ export class ApiService {
   }
 
   logout() {
-    this.user = undefined;
+    this.user.next(null);
 
     localStorage.removeItem('user');
 
@@ -52,10 +46,10 @@ export class ApiService {
   }
 
   createNewItem(formData: any): Observable<any> {
-    return this.http.post<any>(`${this.config}/items/${this.user.id}`, formData);
+    return this.http.post<any>(`${this.config}/items/${this.getUser().id}`, formData);
   }
 
   getItem(iid: string): Observable<any> {
-    return this.http.get<any>(`${this.config}/items/${this.user.id}/${iid}`);
+    return this.http.get<any>(`${this.config}/items/${this.getUser().id}/${iid}`);
   }
 }

@@ -13,7 +13,7 @@ CREATE DATABASE todo
 
 SCHEMA: public
 
-DROP SCHEMA public ;
+DROP SCHEMA public;
 
 CREATE SCHEMA public
     AUTHORIZATION postgres;

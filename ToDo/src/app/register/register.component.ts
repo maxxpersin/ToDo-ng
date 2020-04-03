@@ -33,6 +33,7 @@ export class RegisterComponent implements OnInit {
           this.router.navigate(['/login']);
         },
         error => {
+          console.log(error);
           alert('That email is already assigned to a user');
           this.router.navigate(['/login']);
         }

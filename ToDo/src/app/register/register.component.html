@@ -23,7 +23,10 @@
                 <input name="password" formControlName="password" class="form-control" type="password">
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
-            <a [routerLink]="['/']" class="btn btn-warning float-right">Cancel</a>
+            <span class="float-right"> Already Registered?
+                <a [routerLink]="['/login']" class="btn btn-secondary float-right">Sign In</a>
+            </span>
         </div>
     </div>
+    
 </form>

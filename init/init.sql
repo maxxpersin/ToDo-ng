@@ -1,6 +1,6 @@
 Database: todo
 
-DROP DATABASE todo;
+--DROP DATABASE todo;
 
 CREATE DATABASE todo
     WITH 

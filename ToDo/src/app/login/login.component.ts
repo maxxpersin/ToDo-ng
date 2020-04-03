@@ -15,9 +15,15 @@ export class LoginComponent implements OnInit {
     password: new FormControl('', [Validators.required])
   });
 
+  loginError = false;
+
   constructor(private api: ApiService, private router: Router) { }
 
   ngOnInit(): void {
+  }
+
+  showError() {
+    this.loginError = true;
   }
 
   onSubmit() {
@@ -31,7 +37,7 @@ export class LoginComponent implements OnInit {
           this.router.navigate(['']);
         },
         error => {
-          console.log(error);
+          this.showError();
         }
       )
   }

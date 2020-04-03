@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { ApiService } from '../_services/api/api.service';
 import { User } from '../_models/user/user';
 import { Router } from '@angular/router';
+import { NavBarComponent } from '../nav-bar/nav-bar.component';
 
 @Component({
   selector: 'app-todo-list',
@@ -22,7 +23,7 @@ export class TodoListComponent implements OnInit {
     if (this.user){
       this.getToDoItems();
     } else {
-      this.router.navigate(['/login']);
+      //this.router.navigate(['/login']);
     }
   }
 

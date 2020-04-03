@@ -34,7 +34,7 @@ app.use(session({
     name: 'session-id',
     rolling: true,
     store: new pgSession({
-        tableName: '"Session"'
+        tableName: 'Session'
     })
 }));
 
@@ -101,7 +101,7 @@ app.get('/api/v1/items/:uid', async (req, res) => {
     }
 
     let cleanUserItems = [];
-    for (let i = 0; i < userItems.length; i++){
+    for (let i = 0; i < userItems.length; i++) {
         cleanUserItems.push({
             date: userItems[i].Date,
             description: userItems[i].Description,
@@ -120,12 +120,23 @@ app.post('/api/v1/items/:uid', async (req, res) => {
     return res.json(newItem);
 });
 
-app.get('/api/v1/items/:uid/:iid', (req, res) => {
+app.get('/api/v1/items/:uid/:iid', async (req, res) => {
+    let item = await findItem(req.params.iid);
+    if (item == null) {
+        return res.status(500).send();
+    }
 
-    let user = findUser(req.params.uid);
+    if (item.UserId != req.params.uid) {
+        return res.status(403).send();
+    } else {
+        return res.json({
+            date: item.Date,
+            description: item.Description,
+            id: item.ItemId,
+            title: item.Title
+        });
+    }
 
-    console.log(user);
-    res.json(findItem(user.id, req.params.iid));
 });
 
 async function createUser(data) {
@@ -146,25 +157,17 @@ async function createItem(userId, data) {
             "ItemId", "Description", "Title", "Date", "UserId")
             VALUES ('${id}', '${data.description}', '${data.title}', '${data.date}', '${userId}');`);
     } catch (err) {
-        return err;
+        return null;
     }
 }
 
-function findItem(userId, iid) {
-    let found;
-    items.forEach(item => {
-        if (item.id == userId) {
-            item.items.forEach(i => {
-                if (i.id == iid) {
-                    found = i;
-                    return;
-                }
-            });
-        }
-    });
-
-    console.log(found);
-    return found;
+async function findItem(iid) {
+    try {
+        let item = await client.query(`select * from public."ToDoItem" where "ToDoItem"."ItemId" = '${iid}'`);
+        return item.rows[0];
+    } catch (err) {
+        return err;
+    }
 }
 
 function findUser(uid) {

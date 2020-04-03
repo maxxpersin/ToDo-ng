@@ -22,7 +22,6 @@ export class ItemViewComponent implements OnInit {
       .subscribe(
         data => {
           this.item = data;
-          console.log(this.item);
         },
         error => {
           console.log(error);

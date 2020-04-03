@@ -2,3 +2,14 @@ div.container {
     margin-top: 1em;
 }
 
+div.card-header{
+    display:flex;
+    place-content: end space-between;
+    vertical-align: middle;
+}
+
+button {
+    height: 100%;
+    position: relative;
+    top: 7px;
+}

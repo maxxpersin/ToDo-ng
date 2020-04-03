@@ -22,8 +22,6 @@ export class TodoListComponent implements OnInit {
     this.user = this.api.getUser();
     if (this.user){
       this.getToDoItems();
-    } else {
-      //this.router.navigate(['/login']);
     }
   }
 

@@ -1,3 +1,4 @@
+<app-nav-bar></app-nav-bar>
 <form [formGroup]="registerForm" method="POST" (ngSubmit)="onSubmit()" class="container-fluid">
     <div class="card mx-auto" style="width: 40em; margin-top: 2em; margin-bottom: 2em;">
         <div class="card-header">
@@ -23,10 +24,6 @@
                 <input name="password" formControlName="password" class="form-control" type="password">
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
-            <span class="float-right"> Already Registered?
-                <a [routerLink]="['/login']" class="btn btn-secondary float-right">Sign In</a>
-            </span>
         </div>
     </div>
-    
 </form>

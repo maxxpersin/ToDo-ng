@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { User } from '../_models/user/user';
+import { User } from '../../_models/user/user';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Router } from '@angular/router';
 
@@ -9,8 +9,8 @@ import { Router } from '@angular/router';
 })
 export class AuthenticationService {
 
-  private currentUserSubject: BehaviorSubject<User>;
-  private currentUser: Observable<User>;
+  public currentUserSubject: BehaviorSubject<User>;
+  public currentUser: Observable<User>;
   public route = '/api/v1'
 
   constructor(private http: HttpClient, private router: Router) {
@@ -18,20 +18,8 @@ export class AuthenticationService {
     this.currentUser = this.currentUserSubject.asObservable();
   }
 
-  login(loginCred: any) {
-    let error = this.http.post<User>(`${this.route}/login`, { email: loginCred.email, password: loginCred.password })
-      .subscribe(
-        data => {
-          this.currentUserSubject.next(data);
-          localStorage.setItem('user', JSON.stringify(data));
-          this.router.navigate(['']);
-        },
-        error => {
-          return error;
-        }
-      );
-
-    return error;
+  login(loginCred: any): Observable<User> {
+    return this.http.post<User>(`${this.route}/login`, { email: loginCred.email, password: loginCred.password });
   }
 
   logout() {

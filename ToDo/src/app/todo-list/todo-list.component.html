@@ -17,7 +17,7 @@
                 <tr [routerLink]="['/item/view/', toDo.id]" *ngFor=" let toDo of toDoItems" style="cursor: pointer;">
                     <td>{{toDo.title}}</td>
                     <td>{{toDo.description}}</td>
-                    <td>{{toDo.date}}</td>
+                    <td>{{toDo.date.toDateString()}}</td>
                 </tr>
             </table>
         </div>

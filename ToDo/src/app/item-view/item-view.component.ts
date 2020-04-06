@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../_services/api/api.service';
-import { ToDoItem } from '../to-do-item';
+import { ToDoItem } from '../_models/to-do-item/to-do-item';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -22,6 +22,8 @@ export class ItemViewComponent implements OnInit {
       .subscribe(
         data => {
           this.item = data;
+          let temp = new Date(this.item.date);
+          this.item.date = temp;
         },
         error => {
           console.log(error);

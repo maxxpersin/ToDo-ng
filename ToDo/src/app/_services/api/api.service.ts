@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { ToDoItem } from '../../to-do-item';
+import { ToDoItem } from '../../_models/to-do-item/to-do-item';
 import { User } from '../../_models/user/user';
 import { Router, ActivatedRoute } from '@angular/router';
-import { AuthenticationService } from '../authentication.service';
+import { AuthenticationService } from '../authentication-service/authentication.service';
 
 @Injectable({
   providedIn: 'root'

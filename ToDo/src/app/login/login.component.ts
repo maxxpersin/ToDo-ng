@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../_services/api/api.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthenticationService } from '../_services/authentication.service';
+import { AuthenticationService } from '../_services/authentication-service/authentication.service';
 
 @Component({
   selector: 'app-login',
@@ -28,8 +28,15 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit() {
-    let error = this.authenticationService.login(this.loginForm.value);
-
-    if (error) this.showError();
+    this.authenticationService.login(this.loginForm.value).subscribe(
+      data => {
+        this.authenticationService.currentUserSubject.next(data);
+        localStorage.setItem('user', JSON.stringify(data));
+        this.router.navigate(['']);
+      },
+      error => {
+        this.showError();
+      }
+    );
   }
 }

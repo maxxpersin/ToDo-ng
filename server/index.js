@@ -2,9 +2,9 @@ const express = require('express');
 const app = express();
 const shortId = require('shortid');
 const cookieParser = require('cookie-parser');
-const session = require('express-session');
+//const session = require('express-session');
 const bcrypt = require('bcrypt');
-const pgSession = require('connect-pg-simple')(session);
+//const pgSession = require('connect-pg-simple')(session);
 
 // db connection
 const PostgresClient = require('pg').Client;
@@ -21,22 +21,22 @@ client.connect(err => {
     console.log('Postgres connection successful')
 });
 
-app.use(session({
-    secret: 'nbcai1819hcnalmc9',
-    resave: true,
-    saveUninitialized: false,
-    cookie: {
-        httpOnly: true,
-        secure: false,
-        sameSite: false,
-        maxAge: 1000 * 60 * 10 // cookie valid for 10 mins
-    },
-    name: 'session-id',
-    rolling: true,
-    store: new pgSession({
-        tableName: 'Session'
-    })
-}));
+// app.use(session({
+//     secret: 'nbcai1819hcnalmc9',
+//     resave: true,
+//     saveUninitialized: false,
+//     cookie: {
+//         httpOnly: true,
+//         secure: false,
+//         sameSite: false,
+//         maxAge: 1000 * 60 * 10 // cookie valid for 10 mins
+//     },
+//     name: 'session-id',
+//     rolling: true,
+//     store: new pgSession({
+//         tableName: 'Session'
+//     })
+// }));
 
 const port = 3000;
 
@@ -58,7 +58,6 @@ app.post('/api/v1/register', async (req, res) => {
 
 app.post('/api/v1/login', async (req, res) => {
     let user = await findUserByEmail(req.body.email);
-    console.log(req.session);
 
     if (!user) {
         return res.status(406).json('User not found');
@@ -91,7 +90,7 @@ app.post('/api/v1/login', async (req, res) => {
 });
 
 app.post('/api/v1/logout', async (req, res) => {
-    req.session.destroy();
+    //req.session.destroy();
     return res.sendStatus(200);
 });
 
@@ -101,17 +100,7 @@ app.get('/api/v1/items/:uid', async (req, res) => {
         return res.sendStatus(403);
     }
 
-    let cleanUserItems = [];
-    for (let i = 0; i < userItems.length; i++) {
-        cleanUserItems.push({
-            date: userItems[i].Date,
-            description: userItems[i].Description,
-            id: userItems[i].ItemId,
-            title: userItems[i].Title
-        });
-    }
-
-    return res.json(cleanUserItems);
+    return res.json(userItems);
 });
 
 app.post('/api/v1/items/:uid', async (req, res) => {
@@ -129,15 +118,10 @@ app.get('/api/v1/items/:uid/:iid', async (req, res) => {
         return res.status(500).send();
     }
 
-    if (item.UserId != req.params.uid) {
+    if (item.userid != req.params.uid) {
         return res.status(403).send();
     } else {
-        return res.json({
-            date: item.Date,
-            description: item.Description,
-            id: item.ItemId,
-            title: item.Title
-        });
+        return res.json(item);
     }
 
 });
@@ -166,7 +150,7 @@ async function createItem(userId, data) {
 
 async function findItem(iid) {
     try {
-        let item = await client.query(`select * from public."ToDoItem" where "ToDoItem"."ItemId" = '${iid}'`);
+        let item = await client.query(`select "Date" as date, "ItemId" as id, "Description" as description, "Title" as title, "UserId" as userid from public."ToDoItem" where "ToDoItem"."ItemId" = '${iid}'`);
         return item.rows[0];
     } catch (err) {
         return err;
@@ -206,7 +190,7 @@ async function findUserByEmail(email) {
 
 async function findItems(id) {
     try {
-        items = await client.query(`select * from public."ToDoItem" where "ToDoItem"."UserId" = '${id}'`);
+        items = await client.query(`select "Date" as date, "ItemId" as id, "Description" as description, "Title" as title from public."ToDoItem" where "ToDoItem"."UserId" = '${id}'`);
         return items.rows;
     } catch (err) {
         return null;

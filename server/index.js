@@ -91,7 +91,8 @@ app.post('/api/v1/login', async (req, res) => {
 });
 
 app.post('/api/v1/logout', async (req, res) => {
-
+    req.session.destroy();
+    return res.sendStatus(200);
 });
 
 app.get('/api/v1/items/:uid', async (req, res) => {
@@ -115,9 +116,11 @@ app.get('/api/v1/items/:uid', async (req, res) => {
 
 app.post('/api/v1/items/:uid', async (req, res) => {
     item = req.body;
-    let newItem = await createItem(req.params.uid, item);
+    let err = await createItem(req.params.uid, item);
 
-    return res.json(newItem);
+    if (err) return res.json(err);
+
+    return res.status(200).send();
 });
 
 app.get('/api/v1/items/:uid/:iid', async (req, res) => {

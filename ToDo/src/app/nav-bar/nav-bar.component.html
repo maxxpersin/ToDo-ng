@@ -4,15 +4,15 @@
         <div class="navbar-text" id="navbarResponsive">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item active">
-                    <a *ngIf="!this.user" [routerLink]="['/login']" style="cursor: pointer;"
+                    <a *ngIf="!this.authenticationService.currentUserValue" [routerLink]="['/login']" style="cursor: pointer;"
                         class="nav-link btn btn-secondary" id="create-item">
                         Login
                     </a>
                 </li>
-                <li *ngIf="this.user" class="nav-item active" style="margin-left: 1em;">
+                <li *ngIf="this.authenticationService.currentUserValue" class="nav-item active" style="margin-left: 1em;">
                     <a (click)="logout()" class="nav-link btn btn-secondary" style="cursor: pointer;">Logout</a>
                 </li>
-                <li *ngIf="!this.user" class="nav-item active" style="margin-left: 1em;">
+                <li *ngIf="!this.authenticationService.currentUserValue" class="nav-item active" style="margin-left: 1em;">
                     <a [routerLink]="['/register']" style="cursor: pointer;" class="nav-link btn btn-secondary">
                         Register
                     </a>

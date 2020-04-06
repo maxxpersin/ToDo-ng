@@ -5,6 +5,7 @@ import { ApiService } from '../_services/api/api.service';
 import { User } from '../_models/user/user';
 import { Router } from '@angular/router';
 import { NavBarComponent } from '../nav-bar/nav-bar.component';
+import { AuthenticationService } from '../_services/authentication.service';
 
 @Component({
   selector: 'app-todo-list',
@@ -14,19 +15,15 @@ import { NavBarComponent } from '../nav-bar/nav-bar.component';
 export class TodoListComponent implements OnInit {
 
   toDoItems: ToDoItem[] = [];
-  user: User;
 
-  constructor(private api: ApiService, private router: Router) { }
+  constructor(private api: ApiService, private authenticationService: AuthenticationService, private router: Router) { }
 
   ngOnInit(): void {
-    this.user = this.api.getUser();
-    if (this.user){
-      this.getToDoItems();
-    }
+    this.getToDoItems();
   }
 
   getToDoItems() {
-    this.api.getItems(this.user.id)
+    this.api.getItems(this.authenticationService.currentUserValue.id)
       .subscribe(
         data => {
           console.log(data);

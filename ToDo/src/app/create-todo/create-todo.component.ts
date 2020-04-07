@@ -3,6 +3,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { ApiService } from '../_services/api/api.service';
 import { Router } from '@angular/router';
 import { Validators } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-create-todo',
@@ -20,7 +21,7 @@ export class CreateTodoComponent implements OnInit {
   showError = false;
   submitted = false;
 
-  constructor(private api: ApiService, private router: Router) { }
+  constructor(private api: ApiService, private router: Router, private toastr: ToastrService) { }
 
   ngOnInit(): void {
 
@@ -31,7 +32,7 @@ export class CreateTodoComponent implements OnInit {
       this.api.createNewItem(this.toDoForm.value)
         .subscribe(
           data => {
-            console.log(data);
+            this.toastr.success('Item created');
             this.router.navigate(['/']);
           },
           error => {

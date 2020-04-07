@@ -92,6 +92,28 @@ app.get('/api/v1/items/:uid/:iid', async (req, res) => {
 
 });
 
+app.delete('/api/v1/items/:uid/:iid', async (req, res) => {
+    let item = await findItem(req.params.iid);
+    if (item == null) {
+        return res.status(200).send();
+    }
+
+    if (item.userid != req.params.uid) {
+        return res.status(403).send();
+    } else {
+        await deleteItem(item.id);
+        return res.status(200).send();
+    }
+});
+
+async function deleteItem(iid) {
+    try {
+        await client.query(`DELETE FROM public."ToDoItem" WHERE "ItemId" = '${iid}'`);
+    } catch (err) {
+
+    }
+}
+
 async function createUser(data) {
     let id = shortId.generate();
     let password = bcrypt.hashSync(data.password, 10);

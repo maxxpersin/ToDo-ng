@@ -11,6 +11,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { ItemViewComponent } from './item-view/item-view.component';
 import { RegisterComponent } from './register/register.component';
 import { LoginComponent } from './login/login.component';
+import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { LoginComponent } from './login/login.component';
     AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    ToastrModule.forRoot({ positionClass: 'toast-bottom-center' })
   ],
   providers: [],
   bootstrap: [AppComponent]

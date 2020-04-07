@@ -8,7 +8,8 @@
             </button>
         </div>
         <div class="card-body">
-            <table class="table">
+            <p *ngIf="toDoItems.length == 0">You have nothing to do!</p>
+            <table *ngIf="toDoItems.length > 0" class="table">
                 <tr>
                     <th scope="col">Title</th>
                     <th scope="col">Description</th>
@@ -20,9 +21,6 @@
                     <td>{{toDo.date.toDateString()}}</td>
                 </tr>
             </table>
-        </div>
-        <div class="card-body" *ngIf="toDoItems.length == 0">
-            <p>You have nothing to do!</p>
         </div>
     </div>
 </div>

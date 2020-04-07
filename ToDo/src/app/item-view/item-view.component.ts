@@ -12,6 +12,7 @@ export class ItemViewComponent implements OnInit {
 
   id: string;
   item: ToDoItem;
+  edit = false;
 
   constructor(private api: ApiService, private route: ActivatedRoute) { }
 
@@ -29,6 +30,10 @@ export class ItemViewComponent implements OnInit {
           console.log(error);
         }
       );
+  }
+
+  openEdit() {
+    this.edit = true;
   }
 
 }

@@ -2,9 +2,7 @@ const express = require('express');
 const app = express();
 const shortId = require('shortid');
 const cookieParser = require('cookie-parser');
-//const session = require('express-session');
 const bcrypt = require('bcrypt');
-//const pgSession = require('connect-pg-simple')(session);
 
 // db connection
 const PostgresClient = require('pg').Client;
@@ -20,23 +18,6 @@ client.connect(err => {
 
     console.log('Postgres connection successful')
 });
-
-// app.use(session({
-//     secret: 'nbcai1819hcnalmc9',
-//     resave: true,
-//     saveUninitialized: false,
-//     cookie: {
-//         httpOnly: true,
-//         secure: false,
-//         sameSite: false,
-//         maxAge: 1000 * 60 * 10 // cookie valid for 10 mins
-//     },
-//     name: 'session-id',
-//     rolling: true,
-//     store: new pgSession({
-//         tableName: 'Session'
-//     })
-// }));
 
 const port = 3000;
 
@@ -73,24 +54,9 @@ app.post('/api/v1/login', async (req, res) => {
     } else {
         return res.status(406).json('Invalid password');
     }
-    // if (!user) {
-    //     return res.sendStatus(403);
-    // }
-
-    // let cred = findAuth(user.id);
-    // if (!cred) {
-    //     return res.sendStatus(403);
-    // }
-
-    // if (cred.password == req.body.password) {
-    //     return res.json(user);
-    // }
-
-    // return res.sendStatus(403);
 });
 
 app.post('/api/v1/logout', async (req, res) => {
-    //req.session.destroy();
     return res.sendStatus(200);
 });
 
@@ -176,16 +142,6 @@ async function findUserByEmail(email) {
     } catch (err) {
         return null;
     }
-
-
-    // let found;
-    // users.forEach(user => {
-    //     if (user.email == email) {
-    //         found = user;
-    //         return;
-    //     }
-    // });
-    // return found;
 }
 
 async function findItems(id) {
@@ -195,15 +151,4 @@ async function findItems(id) {
     } catch (err) {
         return null;
     }
-}
-
-function findAuth(cred) {
-    let found = false;
-    auth.forEach(a => {
-        if (cred == a.id) {
-            found = a;
-            return;
-        }
-    });
-    return found;
 }

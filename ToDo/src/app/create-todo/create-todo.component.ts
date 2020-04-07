@@ -12,11 +12,12 @@ import { Validators } from '@angular/forms';
 export class CreateTodoComponent implements OnInit {
 
   toDoForm = new FormGroup({
-    title: new FormControl('', [Validators.required]),
-    date: new FormControl(''),
-    description: new FormControl(''),
+    title: new FormControl('', [Validators.required, Validators.maxLength(20)]),
+    date: new FormControl('', [Validators.required]),
+    description: new FormControl('', [Validators.required]),
   });
 
+  showError = false;
   submitted = false;
 
   constructor(private api: ApiService, private router: Router) { }
@@ -26,20 +27,19 @@ export class CreateTodoComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log(this.toDoForm.value);
-    this.submitted = true;
-
-    this.api.createNewItem(this.toDoForm.value)
-      .subscribe(
-        data => {
-          console.log(data);
-          this.router.navigate(['/']);
-        },
-        error => {
-          console.log(error);
-        }
-      );
-
+    if (this.toDoForm.valid) {
+      this.api.createNewItem(this.toDoForm.value)
+        .subscribe(
+          data => {
+            console.log(data);
+            this.router.navigate(['/']);
+          },
+          error => {
+            console.log(error);
+          }
+        );
+    } else {
+      this.showError = true;
+    }
   }
-
 }

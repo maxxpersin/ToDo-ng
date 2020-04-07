@@ -1,9 +1,9 @@
 <app-nav-bar></app-nav-bar>
 <div class="container">
-    <div class="card">
+    <div *ngIf="!edit" class="card w-50 mx-auto">
         <div class="card-header">
             <h1 style="display: inline;">{{item.title}}</h1>
-            <a class="btn btn-warning float-right" [routerLink]="['/item/edit/', item.id]">Edit</a>
+            <button class="btn btn-warning float-right" (click)="openEdit()">Edit</button>
         </div>
         <div class="card-body">
             <h3>Complete By</h3>
@@ -12,4 +12,10 @@
             <p>{{item.description}}</p>
         </div>
     </div>
-</div>  
+    <div *ngIf="edit" class="card w-50 mx-auto">
+        <form>
+            <div class="card-header"></div>
+            <div class="card-body"></div>
+        </form>
+    </div>
+</div>

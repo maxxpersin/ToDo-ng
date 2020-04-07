@@ -12,7 +12,7 @@ import { AuthenticationService } from '../_services/authentication-service/authe
 export class LoginComponent implements OnInit {
 
   loginForm = new FormGroup({
-    email: new FormControl('', [Validators.required]),
+    email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required])
   });
 
@@ -28,15 +28,17 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit() {
-    this.authenticationService.login(this.loginForm.value).subscribe(
-      data => {
-        this.authenticationService.currentUserSubject.next(data);
-        localStorage.setItem('user', JSON.stringify(data));
-        this.router.navigate(['']);
-      },
-      error => {
-        this.showError();
-      }
-    );
+    if (this.loginForm.valid) {
+      this.authenticationService.login(this.loginForm.value).subscribe(
+        data => {
+          this.authenticationService.currentUserSubject.next(data);
+          localStorage.setItem('user', JSON.stringify(data));
+          this.router.navigate(['']);
+        },
+        error => {
+          this.showError();
+        }
+      );
+    }
   }
 }

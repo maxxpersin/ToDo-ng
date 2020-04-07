@@ -15,7 +15,7 @@ export class RegisterComponent implements OnInit {
   registerForm = new FormGroup({
     firstName: new FormControl('', [Validators.required]),
     lastName: new FormControl('', [Validators.required]),
-    email: new FormControl('', [Validators.required]),
+    email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required])
   });
 
@@ -25,18 +25,19 @@ export class RegisterComponent implements OnInit {
   }
 
   onSubmit() {
-    this.api.registerUser(this.registerForm.value)
-      .subscribe(
-        data => {
-          //this.api.user = data;
-          localStorage.setItem('user', JSON.stringify(data));
-          this.router.navigate(['/login']);
-        },
-        error => {
-          console.log(error);
-          alert('That email is already assigned to a user');
-          this.router.navigate(['/login']);
-        }
-      );
+    if (this.registerForm.valid) {
+      this.api.registerUser(this.registerForm.value)
+        .subscribe(
+          data => {
+            localStorage.setItem('user', JSON.stringify(data));
+            this.router.navigate(['/login']);
+          },
+          error => {
+            console.log(error);
+            alert('That email is already assigned to a user');
+            this.router.navigate(['/login']);
+          }
+        );
+    }
   }
 }

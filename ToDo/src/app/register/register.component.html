@@ -1,12 +1,13 @@
 <app-nav-bar></app-nav-bar>
-<form [formGroup]="registerForm" method="POST" (ngSubmit)="onSubmit()" class="container-fluid">
-    <div class="card mx-auto" style="width: 40em; margin-top: 2em; margin-bottom: 2em;">
+<div class="container">
+    <div class="card w-50 mx-auto">
         <div class="card-header">
             <h1>
                 Sign up
             </h1>
         </div>
         <div class="card-body">
+            <form [formGroup]="registerForm" method="POST" (ngSubmit)="onSubmit()">
             <div class="form-group">
                 <label for="firstName">First Name</label>
                 <input class="form-control" type="text" name="firstName" formControlName="firstName">
@@ -24,6 +25,7 @@
                 <input name="password" formControlName="password" class="form-control" type="password">
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
         </div>
     </div>
-</form>
+</div>

@@ -1,4 +1,10 @@
 .btn-primary {
     padding-left: 0.5em;
     padding-right: 0.5em;
+   
+}
+
+.navbar {
+    height: 60px;
+    margin-bottom: 30px;
 }

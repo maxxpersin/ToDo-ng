@@ -13,9 +13,14 @@
         </div>
     </div>
     <div *ngIf="edit" class="card w-50 mx-auto">
-        <form>
-            <div class="card-header"></div>
+        <form [formGroup]="editToDoForm" (ngSubmit)="onSubmit()">
+            <div class="card-header">
+                <input type="text" maxlength="20" class="form-control" formControl="title">
+            </div>
             <div class="card-body">
+                <input type="date" class="form-control" formControl="date">
+                <textarea class="form-control" formControl="descritpion"></textarea>
+                <input type="submit" class="btn btn-primary" value="Save">
                 <button class="btn btn-danger" (click)="deleteItem(item)">Delete</button>
             </div>
         </form>

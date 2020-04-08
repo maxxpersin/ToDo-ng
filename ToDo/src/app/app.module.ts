@@ -29,7 +29,7 @@ import { ToastrModule } from 'ngx-toastr';
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    ToastrModule.forRoot({ positionClass: 'toast-bottom-center' })
+    ToastrModule.forRoot({ positionClass: 'toast-top-left' })
   ],
   providers: [],
   bootstrap: [AppComponent]

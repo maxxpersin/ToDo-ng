@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { User } from '../_models/user/user';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-register',
@@ -19,7 +20,7 @@ export class RegisterComponent implements OnInit {
     password: new FormControl('', [Validators.required])
   });
 
-  constructor(private api: ApiService, private router: Router) { }
+  constructor(private api: ApiService, private toastr: ToastrService, private router: Router) { }
 
   ngOnInit(): void {
   }
@@ -30,6 +31,7 @@ export class RegisterComponent implements OnInit {
         .subscribe(
           data => {
             localStorage.setItem('user', JSON.stringify(data));
+            this.toastr.success('User created successfully');
             this.router.navigate(['/login']);
           },
           error => {

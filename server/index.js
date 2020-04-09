@@ -3,7 +3,7 @@ const app = express();
 const shortId = require('shortid');
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt');
-
+const session = require('express-session');
 // db connection
 const PostgresClient = require('pg').Client;
 const client = new PostgresClient({
@@ -18,6 +18,20 @@ client.connect(err => {
 
     console.log('Postgres connection successful')
 });
+
+app.use(session({
+    secret: 'sdapovin10832183csikjbasi',
+    resave: true,
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        secure: false,
+        sameSite: false,
+        maxAge: 1000 * 15
+    },
+    name: 'session-id',
+    rolling: true,
+}));
 
 const port = 3000;
 

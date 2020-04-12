@@ -4,6 +4,18 @@ const shortId = require('shortid');
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt');
 const session = require('express-session');
+const knex = require('knex')({
+    client: 'pg',
+    connection: {
+        host: 'localhost',
+        user: 'postgres',
+        password: 'admin',
+        database: 'todo'
+    }
+});
+
+console.log(knex.raw[1]);
+
 // db connection
 const PostgresClient = require('pg').Client;
 const client = new PostgresClient({
@@ -18,6 +30,12 @@ client.connect(err => {
 
     console.log('Postgres connection successful')
 });
+
+knex.select().table('User').then(res => {
+    console.log(res);
+}).catch(err => {
+    console.log(err);
+})
 
 app.use(session({
     secret: 'sdapovin10832183csikjbasi',

@@ -14,22 +14,21 @@ const knex = require('knex')({
     }
 });
 
-console.log(knex.raw[1]);
 
 // db connection
-const PostgresClient = require('pg').Client;
-const client = new PostgresClient({
-    user: 'postgres',
-    password: 'admin',
-    host: 'localhost',
-    port: 5432,
-    database: 'todo'
-});
-client.connect(err => {
-    if (err) console.log('Could not connect', err);
+// const PostgresClient = require('pg').Client;
+// const client = new PostgresClient({
+//     user: 'postgres',
+//     password: 'admin',
+//     host: 'localhost',
+//     port: 5432,
+//     database: 'todo'
+// });
+// client.connect(err => {
+//     if (err) console.log('Could not connect', err);
 
-    console.log('Postgres connection successful')
-});
+//     console.log('Postgres connection successful')
+// });
 
 knex.select().table('User').then(res => {
     console.log(res);
@@ -59,13 +58,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+app.get('/', async (req, res) => {
+    return res.json(
+        await knex.select().from('User').where({Email: 'maxxpersin@gmail.com'})
+    );
+});
+
 app.post('/api/v1/register', async (req, res) => {
     //console.log(req.body);
     let user = await findUserByEmail(req.body.email);
     if (user) {
         return res.status(406).json('Email already exists');
     }
-    await createUser(req.body);
+    let err = await createUser(req.body);
     return res.status(200).send();
 });
 
@@ -150,8 +155,15 @@ async function createUser(data) {
     let id = shortId.generate();
     let password = bcrypt.hashSync(data.password, 10);
     try {
-        await client.query(`INSERT INTO public."User"("UserId", "FirstName", "LastName", "Password", "Email")
-        VALUES ('${id}', '${data.firstName}', '${data.lastName}', '${password}', '${data.email}');`);
+        await knex('User').insert({
+            UserId: id,
+            FirstName: data.firstName,
+            LastName: data.lastName,
+            Password: password,
+            Email: data.email
+        });
+        // await client.query(`INSERT INTO public."User"("UserId", "FirstName", "LastName", "Password", "Email")
+        // VALUES ('${id}', '${data.firstName}', '${data.lastName}', '${password}', '${data.email}');`);
     } catch (err) {
         return err;
     }
@@ -191,8 +203,11 @@ function findUser(uid) {
 
 async function findUserByEmail(email) {
     try {
-        let user = await client.query(`select * from public."User" where "User"."Email" = '${email}'`);
-        return user.rows[0];
+        let user = await knex.select().from('User').where({Email: email});
+        //console.log(user);
+        return user[0];
+        //user = await client.query(`select * from public."User" where "User"."Email" = '${email}'`);
+        //return user.rows[0];
     } catch (err) {
         return null;
     }

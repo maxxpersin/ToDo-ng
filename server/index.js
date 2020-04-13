@@ -67,82 +67,114 @@ app.post('/api/v1/register', async (req, res) => {
     return res.status(200).send();
 });
 
-app.post('/api/v1/login', async (req, res) => {
-    let user = await findUserByEmail(req.body.email);
+app.post('/api/v1/login', (req, res) => {
+    req.session.regenerate(async err => {
+        if (err) return res.status(500).send();
+        let user = await findUserByEmail(req.body.email);
 
-    if (!user) {
-        return res.status(406).json('User not found');
-    }
-    if (await bcrypt.compare(req.body.password, user.Password)) {
-        let cleanUser = {
-            id: user.UserId,
-            name: `${user.FirstName} ${user.LastName}`,
-            email: user.Email
-        };
+        if (!user) {
+            return res.status(406).json('User not found');
+        }
+        if (await bcrypt.compare(req.body.password, user.Password)) {
+            let cleanUser = {
+                id: user.UserId,
+                name: `${user.FirstName} ${user.LastName}`,
+                email: user.Email
+            };
 
-        return res.json(cleanUser);
-    } else {
-        return res.status(406).json('Invalid password');
-    }
+            let sessionId = shortId.generate();
+            req.session.sessionId = sessionId;
+            req.session.user = cleanUser.id;
+            await knex('Session').insert({ SessionId: sessionId, Expiration: req.session.cookie._expires, UserId: cleanUser.id });
+
+            return res.json(cleanUser);
+        } else {
+            return res.status(406).json('Invalid password');
+        }
+    });
 });
 
 app.post('/api/v1/logout', async (req, res) => {
+    await knex('Session').where('SessionId', 'like', req.session.sessionId).del().catch(err => console.log(err));
+    req.session.destroy();
     return res.sendStatus(200);
 });
 
 app.get('/api/v1/items/:uid', async (req, res) => {
-    let userItems = await findItems(req.params.uid);
-    if (userItems == 'null') {
-        return res.sendStatus(403);
-    }
+    console.log(req.params.uid == req.session.user);
+    console.log(req.session.cookie._expires.getTime() >= Date.now());
+    if (validSession(req.session, req.params.uid)) {
+        let userItems = await findItems(req.params.uid);
+        if (userItems == 'null') {
+            return res.sendStatus(403);
+        }
 
-    return res.json(userItems);
+        return res.json(userItems);
+    } else {
+        return res.status(403).send();
+    }
 });
 
 app.post('/api/v1/items/:uid', async (req, res) => {
-    item = req.body;
-    let err = await createItem(req.params.uid, item);
+    if (validSession(req.session, req.params.uid)) {
+        item = req.body;
+        let err = await createItem(req.params.uid, item);
 
-    if (err) return res.json(err);
+        if (err) return res.json(err);
 
-    return res.status(200).send();
+        return res.status(200).send();
+    } else {
+        return res.status(403).send();
+    }
 });
 
 app.get('/api/v1/items/:uid/:iid', async (req, res) => {
-    let item = await findItem(req.params.iid);
-    if (item == null) {
-        return res.status(500).send();
-    }
+    if (validSession(req.session, req.params.uid)) {
+        let item = await findItem(req.params.iid);
+        if (item == null) {
+            return res.status(500).send();
+        }
 
-    if (item.userid != req.params.uid) {
-        return res.status(403).send();
+        if (item.userid != req.params.uid) {
+            return res.status(403).send();
+        } else {
+            return res.json(item);
+        }
     } else {
-        return res.json(item);
+        return res.status(403).send();
     }
-
 });
 
 app.delete('/api/v1/items/:uid/:iid', async (req, res) => {
-    let item = await findItem(req.params.iid);
-    if (item == null) {
-        return res.status(200).send();
-    }
+    if (validSession(req.session, req.params.uid)) {
+        let item = await findItem(req.params.iid);
+        if (item == null) {
+            return res.status(200).send();
+        }
 
-    if (item.userid != req.params.uid) {
-        return res.status(403).send();
+        if (item.userid != req.params.uid) {
+            return res.status(403).send();
+        } else {
+            await deleteItem(item.id);
+            return res.status(200).send();
+        }
     } else {
-        await deleteItem(item.id);
-        return res.status(200).send();
+        return res.status(403).send();
     }
 });
 
 async function deleteItem(iid) {
     try {
-        await knex('ToDoItem').where({ItemId: iid}).del();
-       // await client.query(`DELETE FROM public."ToDoItem" WHERE "ItemId" = '${iid}'`);
+        await knex('ToDoItem').where({ ItemId: iid }).del();
+        // await client.query(`DELETE FROM public."ToDoItem" WHERE "ItemId" = '${iid}'`);
     } catch (err) {
 
     }
+}
+
+function validSession(session, uid) {
+    console.log(session, uid);
+    return (session.user == uid && session.cookie._expires.getTime() >= Date.now());
 }
 
 async function createUser(data) {

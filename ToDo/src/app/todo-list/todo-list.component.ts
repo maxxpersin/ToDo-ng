@@ -23,8 +23,8 @@ export class TodoListComponent implements OnInit {
   }
 
   pastCompleteBy(item: ToDoItem) {
-    console.log(item.date.getDate(), ' ', Date.now());
-    return item.date.getDate() <= Date.now();
+    console.log(item.date, ' ', Date.now());
+    return item.date.getTime() <= Date.now();
   }
 
   getToDoItems() {

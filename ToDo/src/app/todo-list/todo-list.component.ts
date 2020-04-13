@@ -22,6 +22,11 @@ export class TodoListComponent implements OnInit {
     this.getToDoItems();
   }
 
+  pastCompleteBy(item: ToDoItem) {
+    console.log(item.date.getDate(), ' ', Date.now());
+    return item.date.getDate() <= Date.now();
+  }
+
   getToDoItems() {
     this.api.getItems(this.authenticationService.currentUserValue.id)
       .subscribe(

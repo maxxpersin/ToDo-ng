@@ -30,12 +30,6 @@ const knex = require('knex')({
 //     console.log('Postgres connection successful')
 // });
 
-knex.select().table('User').then(res => {
-    console.log(res);
-}).catch(err => {
-    console.log(err);
-})
-
 app.use(session({
     secret: 'sdapovin10832183csikjbasi',
     resave: true,
@@ -60,12 +54,11 @@ app.use(cookieParser());
 
 app.get('/', async (req, res) => {
     return res.json(
-        await knex.select().from('User').where({Email: 'maxxpersin@gmail.com'})
+        await knex.select().from('User').where('Email', 'like', '%')
     );
 });
 
 app.post('/api/v1/register', async (req, res) => {
-    //console.log(req.body);
     let user = await findUserByEmail(req.body.email);
     if (user) {
         return res.status(406).json('Email already exists');
@@ -145,7 +138,8 @@ app.delete('/api/v1/items/:uid/:iid', async (req, res) => {
 
 async function deleteItem(iid) {
     try {
-        await client.query(`DELETE FROM public."ToDoItem" WHERE "ItemId" = '${iid}'`);
+        await knex('ToDoItem').where({ItemId: iid}).del();
+       // await client.query(`DELETE FROM public."ToDoItem" WHERE "ItemId" = '${iid}'`);
     } catch (err) {
 
     }
@@ -172,9 +166,16 @@ async function createUser(data) {
 async function createItem(userId, data) {
     let id = shortId.generate();
     try {
-        await client.query(`INSERT INTO public."ToDoItem"(
-            "ItemId", "Description", "Title", "Date", "UserId")
-            VALUES ('${id}', '${data.description}', '${data.title}', '${data.date}', '${userId}');`);
+        await knex('ToDoItem').insert({
+            ItemId: id,
+            Description: data.description,
+            Title: data.title,
+            Date: data.date,
+            UserId: userId
+        });
+        // await client.query(`INSERT INTO public."ToDoItem"(
+        //     "ItemId", "Description", "Title", "Date", "UserId")
+        //     VALUES ('${id}', '${data.description}', '${data.title}', '${data.date}', '${userId}');`);
     } catch (err) {
         return null;
     }
@@ -182,8 +183,9 @@ async function createItem(userId, data) {
 
 async function findItem(iid) {
     try {
-        let item = await client.query(`select "Date" as date, "ItemId" as id, "Description" as description, "Title" as title, "UserId" as userid from public."ToDoItem" where "ToDoItem"."ItemId" = '${iid}'`);
-        return item.rows[0];
+        let item = await knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title', 'UserId as userid').from('ToDoItem').where({ ItemId: iid });
+        //let item = await client.query(`select "Date" as date, "ItemId" as id, "Description" as description, "Title" as title, "UserId" as userid from public."ToDoItem" where "ToDoItem"."ItemId" = '${iid}'`);
+        return item[0];
     } catch (err) {
         return err;
     }
@@ -203,7 +205,7 @@ function findUser(uid) {
 
 async function findUserByEmail(email) {
     try {
-        let user = await knex.select().from('User').where({Email: email});
+        let user = await knex.select().from('User').where({ Email: email });
         //console.log(user);
         return user[0];
         //user = await client.query(`select * from public."User" where "User"."Email" = '${email}'`);
@@ -215,8 +217,9 @@ async function findUserByEmail(email) {
 
 async function findItems(id) {
     try {
-        items = await client.query(`select "Date" as date, "ItemId" as id, "Description" as description, "Title" as title from public."ToDoItem" where "ToDoItem"."UserId" = '${id}'`);
-        return items.rows;
+        let items = knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title').from('ToDoItem').where({ UserId: id });
+        // items = await client.query(`select "Date" as date, "ItemId" as id, "Description" as description, "Title" as title from public."ToDoItem" where "ToDoItem"."UserId" = '${id}'`);
+        return items;
     } catch (err) {
         return null;
     }

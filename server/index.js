@@ -3,7 +3,7 @@ const app = express();
 const shortId = require('shortid');
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt');
-const session = require('express-session');
+const bodyParser = require('body-parser');
 const knex = require('knex')({
     client: 'pg',
     connection: {
@@ -30,19 +30,19 @@ const knex = require('knex')({
 //     console.log('Postgres connection successful')
 // });
 
-app.use(session({
-    secret: 'sdapovin10832183csikjbasi',
-    resave: true,
-    saveUninitialized: false,
-    cookie: {
-        httpOnly: true,
-        secure: false,
-        sameSite: false,
-        maxAge: 1000 * 15
-    },
-    name: 'session-id',
-    rolling: true,
-}));
+// app.use(session({
+//     secret: 'sdapovin10832183csikjbasi',
+//     resave: true,
+//     saveUninitialized: false,
+//     cookie: {
+//         httpOnly: true,
+//         secure: false,
+//         sameSite: false,
+//         maxAge: 1000 * 15
+//     },
+//     name: 'session-id',
+//     rolling: true,
+// }));
 
 const port = 3000;
 
@@ -51,6 +51,7 @@ app.listen(port, () => console.log('ToDo App listening on port 3000'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+//app.use(bodyParser());
 
 app.get('/', async (req, res) => {
     return res.json(
@@ -67,43 +68,40 @@ app.post('/api/v1/register', async (req, res) => {
     return res.status(200).send();
 });
 
-app.post('/api/v1/login', (req, res) => {
-    req.session.regenerate(async err => {
-        if (err) return res.status(500).send();
-        let user = await findUserByEmail(req.body.email);
+app.post('/api/v1/login', async (req, res) => {
+    let user = await findUserByEmail(req.body.email);
+    if (!user) {
+        return res.status(406).json('User not found');
+    }
+    if (await bcrypt.compare(req.body.password, user.Password)) {
+        let cleanUser = {
+            id: user.UserId,
+            name: `${user.FirstName} ${user.LastName}`,
+            email: user.Email,
+            sessionId: shortId.generate()
+        };
 
-        if (!user) {
-            return res.status(406).json('User not found');
-        }
-        if (await bcrypt.compare(req.body.password, user.Password)) {
-            let cleanUser = {
-                id: user.UserId,
-                name: `${user.FirstName} ${user.LastName}`,
-                email: user.Email
-            };
+        await knex('Session').insert({
+            SessionId: cleanUser.sessionId,
+            Expiration: Date.now().toString(),
+            UserId: cleanUser.id
+        });
 
-            let sessionId = shortId.generate();
-            req.session.sessionId = sessionId;
-            req.session.user = cleanUser.id;
-            await knex('Session').insert({ SessionId: sessionId, Expiration: req.session.cookie._expires, UserId: cleanUser.id });
-
-            return res.json(cleanUser);
-        } else {
-            return res.status(406).json('Invalid password');
-        }
-    });
+        return res.json(cleanUser);
+    } else {
+        return res.status(406).json('Invalid password');
+    }
 });
 
 app.post('/api/v1/logout', async (req, res) => {
-    await knex('Session').where('SessionId', 'like', req.session.sessionId).del().catch(err => console.log(err));
-    req.session.destroy();
-    return res.sendStatus(200);
+    console.log(req.body);
+    let user = req.body;
+    await knex('Session').where('SessionId', 'like', `${req.body.sessionId}`, 'and', 'UserId', 'like', `${req.body.id}`).del().catch(err => console.log(err));
+    return res.json('OK');
 });
 
 app.get('/api/v1/items/:uid', async (req, res) => {
-    console.log(req.params.uid == req.session.user);
-    console.log(req.session.cookie._expires.getTime() >= Date.now());
-    if (validSession(req.session, req.params.uid)) {
+    if (validSession('', req.params.uid)) {
         let userItems = await findItems(req.params.uid);
         if (userItems == 'null') {
             return res.sendStatus(403);
@@ -116,7 +114,7 @@ app.get('/api/v1/items/:uid', async (req, res) => {
 });
 
 app.post('/api/v1/items/:uid', async (req, res) => {
-    if (validSession(req.session, req.params.uid)) {
+    if (validSession('', req.params.uid)) {
         item = req.body;
         let err = await createItem(req.params.uid, item);
 
@@ -129,7 +127,7 @@ app.post('/api/v1/items/:uid', async (req, res) => {
 });
 
 app.get('/api/v1/items/:uid/:iid', async (req, res) => {
-    if (validSession(req.session, req.params.uid)) {
+    if (validSession('', req.params.uid)) {
         let item = await findItem(req.params.iid);
         if (item == null) {
             return res.status(500).send();
@@ -146,7 +144,7 @@ app.get('/api/v1/items/:uid/:iid', async (req, res) => {
 });
 
 app.delete('/api/v1/items/:uid/:iid', async (req, res) => {
-    if (validSession(req.session, req.params.uid)) {
+    if (validSession('', req.params.uid)) {
         let item = await findItem(req.params.iid);
         if (item == null) {
             return res.status(200).send();
@@ -172,9 +170,8 @@ async function deleteItem(iid) {
     }
 }
 
-function validSession(session, uid) {
-    console.log(session, uid);
-    return (session.user == uid && session.cookie._expires.getTime() >= Date.now());
+function validSession(sessionId, userId) {
+    return true;
 }
 
 async function createUser(data) {

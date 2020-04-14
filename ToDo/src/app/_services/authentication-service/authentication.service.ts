@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { User } from '../../_models/user/user';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Router } from '@angular/router';
+import { ResourceLoader } from '@angular/compiler';
 
 @Injectable({
   providedIn: 'root'
@@ -23,10 +24,19 @@ export class AuthenticationService {
   }
 
   logout() {
+    this.http.post<any>(`${this.route}/logout`, this.currentUserValue)
+      .subscribe(
+        data => {
+          console.log(data);
+        },
+        error => {
+          console.log(error);
+        }
+      );
+    console.log(this.currentUserValue);
     this.currentUserSubject.next(null);
     localStorage.removeItem('user');
-    location.reload();
-    return this.http.post<any>(`${this.route}/logout`, null);
+    this.router.navigate(['/login']);
   }
 
   public get currentUserValue() {

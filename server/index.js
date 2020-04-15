@@ -94,7 +94,6 @@ app.post('/api/v1/login', async (req, res) => {
 });
 
 app.post('/api/v1/logout', async (req, res) => {
-    console.log(req.body);
     let user = req.body;
     await knex('Session').where('SessionId', 'like', `${req.body.sessionId}`, 'and', 'UserId', 'like', `${req.body.id}`).del().catch(err => console.log(err));
     return res.json('OK');
@@ -127,9 +126,8 @@ app.get('/api/v1/items/:uid', async (req, res) => {
         if (!req.query.order || !properOrderInput(req.query.order)) {
             req.query.order = 'default';
         }
-        console.log(req.params.uid, req.query.group, req.query.order);
-
         let userItems = await findItems(req.params.uid, req.query.group, req.query.order);
+        console.log(userItems);
         if (userItems == 'null') {
             return res.sendStatus(403);
         }
@@ -140,11 +138,10 @@ app.get('/api/v1/items/:uid', async (req, res) => {
     }
 });
 
-app.post('/api/v1/items/:uid', async (req, res) => {
+app.post('/api/v1/:uid/groups/:gid/items', async (req, res) => {
     if (validSession('', req.params.uid)) {
         let item = req.body;
-        let err = await createItem(req.params.uid, item);
-
+        let err = await createItem(item);
         if (err) return res.json(err);
 
         return res.status(200).send();
@@ -153,24 +150,20 @@ app.post('/api/v1/items/:uid', async (req, res) => {
     }
 });
 
-app.get('/api/v1/items/:uid/:iid', async (req, res) => {
+app.get('/api/v1/:uid/groups/:gid/items/:iid', async (req, res) => {
     if (validSession('', req.params.uid)) {
         let item = await findItem(req.params.iid);
         if (item == null) {
             return res.status(500).send();
         }
-
-        if (item.userid != req.params.uid) {
-            return res.status(403).send();
-        } else {
-            return res.json(item);
-        }
+        console.log(item);
+        return res.json(item);
     } else {
         return res.status(403).send();
     }
 });
 
-app.delete('/api/v1/items/:uid/:iid', async (req, res) => {
+app.delete('/api/v1/:uid/groups/:gid/items/:iid', async (req, res) => {
     if (validSession('', req.params.uid)) {
         let item = await findItem(req.params.iid);
         if (item == null) {
@@ -228,7 +221,8 @@ async function createUser(data) {
     }
 }
 
-async function createItem(userId, data) {
+async function createItem(data) {
+    console.log(data, ' created data');
     let id = shortId.generate();
     try {
         await knex('ToDoItem').insert({
@@ -236,12 +230,13 @@ async function createItem(userId, data) {
             Description: data.description,
             Title: data.title,
             Date: data.date,
-            UserId: userId
+            GroupId: data.groupId
         });
         // await client.query(`INSERT INTO public."ToDoItem"(
         //     "ItemId", "Description", "Title", "Date", "UserId")
         //     VALUES ('${id}', '${data.description}', '${data.title}', '${data.date}', '${userId}');`);
     } catch (err) {
+        console.log(err);
         return null;
     }
 }
@@ -262,7 +257,7 @@ async function createGroup(userId, data) {
 
 async function findItem(iid) {
     try {
-        let item = await knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title', 'UserId as userid').from('ToDoItem').where({ ItemId: iid });
+        let item = await knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title', 'GroupId as groupId').from('ToDoItem').where({ ItemId: iid });
         //let item = await client.query(`select "Date" as date, "ItemId" as id, "Description" as description, "Title" as title, "UserId" as userid from public."ToDoItem" where "ToDoItem"."ItemId" = '${iid}'`);
         return item[0];
     } catch (err) {

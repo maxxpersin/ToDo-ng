@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ApiService } from '../_services/api/api.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 
@@ -16,12 +16,13 @@ export class CreateTodoComponent implements OnInit {
     title: new FormControl('', [Validators.required, Validators.maxLength(20)]),
     date: new FormControl('', [Validators.required]),
     description: new FormControl('', [Validators.required]),
+    groupId: new FormControl(this.route.snapshot.paramMap.get('gid'))
   });
 
   showError = false;
   submitted = false;
 
-  constructor(private api: ApiService, private router: Router, private toastr: ToastrService) { }
+  constructor(private api: ApiService, private router: Router, private toastr: ToastrService, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
 
@@ -33,7 +34,7 @@ export class CreateTodoComponent implements OnInit {
         .subscribe(
           data => {
             this.toastr.success('Item created');
-            this.router.navigate(['/']);
+            this.router.navigate([`group/${this.route.snapshot.paramMap.get('gid')}`]);
           },
           error => {
             console.log(error);

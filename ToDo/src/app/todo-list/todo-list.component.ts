@@ -25,7 +25,6 @@ export class TodoListComponent implements OnInit {
   }
 
   pastCompleteBy(item: ToDoItem) {
-    console.log(item.date, ' ', Date.now());
     return item.date.getTime() <= Date.now();
   }
 
@@ -58,5 +57,13 @@ export class TodoListComponent implements OnInit {
       let temp = new Date(item.date);
       item.date = temp;
     });
+  }
+
+  goToCreateToDo() {
+    this.router.navigate([`group/${this.groupId}/create-todo`]);
+  }
+
+  toItemView(iid: string) {
+    this.router.navigate([`group/${this.groupId}/item/view/${iid}`]);
   }
 }

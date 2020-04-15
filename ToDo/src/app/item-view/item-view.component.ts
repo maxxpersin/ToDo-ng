@@ -13,6 +13,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 export class ItemViewComponent implements OnInit {
 
   id: string;
+  gid: string;
   item: ToDoItem;
   edit = false;
 
@@ -26,8 +27,8 @@ export class ItemViewComponent implements OnInit {
 
   ngOnInit(): void {
     this.id = this.route.snapshot.paramMap.get('id');
-
-    this.api.getItem(this.id)
+    this.gid = this.route.snapshot.paramMap.get('gid');
+    this.api.getItem(this.gid, this.id)
       .subscribe(
         data => {
           this.item = data;

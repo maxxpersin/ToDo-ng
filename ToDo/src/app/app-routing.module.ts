@@ -15,8 +15,8 @@ const routes: Routes = [
   { path: '', component: ListGroupComponent, canActivate: [AuthGuard] },
   { path: 'group/:gid', component: TodoListComponent, canActivate: [AuthGuard] },
   { path: 'create-group', component: CreateGroupComponent, canActivate: [AuthGuard] },
-  { path: 'create-todo', component: CreateTodoComponent, canActivate: [AuthGuard] },
-  { path: 'item/view/:id', component: ItemViewComponent, canActivate: [AuthGuard] },
+  { path: 'group/:gid/create-todo', component: CreateTodoComponent, canActivate: [AuthGuard] },
+  { path: 'group/:gid/item/view/:id', component: ItemViewComponent, canActivate: [AuthGuard] },
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
   { path: '**', redirectTo: '' }

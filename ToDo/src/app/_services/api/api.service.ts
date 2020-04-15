@@ -24,7 +24,6 @@ export class ApiService {
   }
 
   createNewGroup(uid: string, formData: any) {
-    console.log(formData);
     return this.http.post<any>(`${this.config}/groups/${uid}`, formData);
   }
 
@@ -37,11 +36,11 @@ export class ApiService {
   }
 
   createNewItem(formData: any): Observable<any> {
-    return this.http.post<any>(`${this.config}/items/${this.authenticationService.currentUserValue.id}`, formData);
+    return this.http.post<any>(`${this.config}/${this.authenticationService.currentUserValue}/groups/${formData.groupId}/items`, formData);
   }
 
-  getItem(iid: string): Observable<any> {
-    return this.http.get<any>(`${this.config}/items/${this.authenticationService.currentUserValue.id}/${iid}`);
+  getItem(gid: string, iid: string): Observable<any> {
+    return this.http.get<any>(`${this.config}/${this.authenticationService.currentUserValue.id}/groups/${gid}/items/${iid}`);
   }
 
   deleteItem(iid: string): Observable<any> {

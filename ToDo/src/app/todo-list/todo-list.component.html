@@ -12,7 +12,7 @@
                         <option value="Title">Title</option>
                     </select>
                 </form>
-                <button [routerLink]="['/create-todo']" class="btn btn-primary" id="create-item">
+                <button (click)="goToCreateToDo()" class="btn btn-primary" id="create-item">
                     Create New ToDo
                 </button>
             </span>
@@ -25,7 +25,7 @@
                     <th scope="col">Description</th>
                     <th scope="col">Complete By</th>
                 </tr>
-                <tr [routerLink]="['/item/view/', toDo.id]" *ngFor=" let toDo of toDoItems" style="cursor: pointer;">
+                <tr (click)="toItemView(toDo.id)" *ngFor=" let toDo of toDoItems" style="cursor: pointer;">
                     <td>{{toDo.title}}</td>
                     <td>{{toDo.description}}</td>
                     <td *ngIf="pastCompleteBy(toDo)" style="color: red">{{toDo.date.toDateString()}}</td>

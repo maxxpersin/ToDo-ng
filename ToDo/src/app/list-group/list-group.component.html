@@ -1,6 +1,6 @@
 <app-nav-bar></app-nav-bar>
 <div class="container">
-    <div class="card">
+    <div class="card" id="main">
         <div class="card-header">
             <h1>Your Groups</h1>
             <button [routerLink]="['/create-group']" class="btn btn-primary">New Group</button>
@@ -9,10 +9,16 @@
             <div *ngIf="groups.length == 0">
                 You have no groups!
             </div>
-            <div *ngIf="groups.length > 0">
+            <div *ngIf="groups.length > 0" class="inner">
                 <div [routerLink]="['/group/', group.groupId]" class="card" *ngFor="let group of groups">
-                    <div class="card-header">{{ group.name }}</div>
-                    <div class="card-body"></div>
+                    <div class="card-header">
+                        <h2>{{ group.name }}</h2>
+                    </div>
+                    <div class="card-body">
+                        <ol>
+                           <li *ngFor="let item of group.items">{{ item.title }}</li> 
+                        </ol>
+                    </div>
                 </div>
             </div>
         </div>

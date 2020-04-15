@@ -1,5 +1,20 @@
-div.card-header {
+#main>div.card-header {
     display:flex;
     place-content: end space-between;
     align-items: center;
+}
+
+div.inner {
+    display: flex;
+    justify-items: auto;
+    align-items: flex-start;
+}
+
+div.inner>div {
+    width: 25%;
+    cursor: pointer;
+}
+
+h2 {
+    font-size: 1.5em;
 }

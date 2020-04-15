@@ -3,7 +3,7 @@ import { ToDoItem } from '../_models/to-do-item/to-do-item';
 import { HttpClient } from '@angular/common/http';
 import { ApiService } from '../_services/api/api.service';
 import { User } from '../_models/user/user';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { NavBarComponent } from '../nav-bar/nav-bar.component';
 import { AuthenticationService } from '../_services/authentication-service/authentication.service';
 
@@ -15,10 +15,12 @@ import { AuthenticationService } from '../_services/authentication-service/authe
 export class TodoListComponent implements OnInit {
 
   toDoItems: ToDoItem[] = [];
+  groupId: string;
 
-  constructor(private api: ApiService, private authenticationService: AuthenticationService, private router: Router) { }
+  constructor(private api: ApiService, private authenticationService: AuthenticationService, private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
+    this.groupId = this.route.snapshot.paramMap.get('gid');
     this.getToDoItems();
   }
 
@@ -28,18 +30,33 @@ export class TodoListComponent implements OnInit {
   }
 
   getToDoItems() {
-    this.api.getItems(this.authenticationService.currentUserValue.id)
+    this.api.getItems(this.authenticationService.currentUserValue.id, this.groupId, '')
       .subscribe(
         data => {
-          console.log(data);
           this.toDoItems = data;
-          this.toDoItems.forEach(item => {
-            let temp = new Date(item.date);
-            item.date = temp;
-          });
+          this.formatDate(this.toDoItems);
         }, error => {
           console.log(error);
         }
       );
+  }
+
+  updateTable(choice: any) {
+    this.api.getItems(this.authenticationService.currentUserValue.id, this.groupId, choice)
+      .subscribe(
+        data => {
+          this.toDoItems = data;
+          this.formatDate(this.toDoItems);
+        }, error => {
+          console.log(error);
+        }
+      )
+  }
+
+  formatDate(items: ToDoItem[]) {
+    this.toDoItems.forEach(item => {
+      let temp = new Date(item.date);
+      item.date = temp;
+    });
   }
 }

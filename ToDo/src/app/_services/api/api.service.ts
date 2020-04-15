@@ -23,8 +23,17 @@ export class ApiService {
     return this.http.post<any>(`${this.config}/register`, newUser);
   }
 
-  getItems(uid: string): Observable<any> {
-    return this.http.get<any>(`${this.config}/items/${uid}`)
+  createNewGroup(uid: string, formData: any) {
+    console.log(formData);
+    return this.http.post<any>(`${this.config}/groups/${uid}`, formData);
+  }
+
+  getGroups(uid: string): Observable<any> {
+    return this.http.get<any>(`${this.config}/groups/${uid}`);
+  }
+
+  getItems(uid: string, group: string, options: any): Observable<any> {
+    return this.http.get<any>(`${this.config}/items/${uid}?group=${group}&order=${options || 'default'}`);
   }
 
   createNewItem(formData: any): Observable<any> {

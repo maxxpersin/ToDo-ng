@@ -100,9 +100,36 @@ app.post('/api/v1/logout', async (req, res) => {
     return res.json('OK');
 });
 
+app.get('/api/v1/groups/:uid', async (req, res) => {
+    if (validSession('', req.params.uid)) {
+        let groups = await findGroups(req.params.uid);
+        if (!groups) {
+            return res.status(500).send();
+        }
+        return res.json(groups);
+    } else {
+        return res.status(403).send();
+    }
+});
+
+app.post('/api/v1/groups/:uid', async (req, res) => {
+    if (validSession('', req.params.uid)) {
+        await createGroup(req.params.uid, req.body);
+        return res.status(200).send();
+    } else {
+        return res.status(403).send();
+    }
+
+});
+
 app.get('/api/v1/items/:uid', async (req, res) => {
     if (validSession('', req.params.uid)) {
-        let userItems = await findItems(req.params.uid);
+        if (!req.query.order || !properOrderInput(req.query.order)) {
+            req.query.order = 'default';
+        }
+        console.log(req.params.uid, req.query.group, req.query.order);
+
+        let userItems = await findItems(req.params.uid, req.query.group, req.query.order);
         if (userItems == 'null') {
             return res.sendStatus(403);
         }
@@ -115,7 +142,7 @@ app.get('/api/v1/items/:uid', async (req, res) => {
 
 app.post('/api/v1/items/:uid', async (req, res) => {
     if (validSession('', req.params.uid)) {
-        item = req.body;
+        let item = req.body;
         let err = await createItem(req.params.uid, item);
 
         if (err) return res.json(err);
@@ -160,6 +187,15 @@ app.delete('/api/v1/items/:uid/:iid', async (req, res) => {
         return res.status(403).send();
     }
 });
+
+async function findGroups(userId) {
+    try {
+        let groups = await knex.select('GroupId as groupId', 'Name as name').from('ToDoGroup').where({ UserId: userId });
+        return groups
+    } catch (err) {
+        return null;
+    }
+}
 
 async function deleteItem(iid) {
     try {
@@ -210,6 +246,20 @@ async function createItem(userId, data) {
     }
 }
 
+async function createGroup(userId, data) {
+    let id = shortId.generate();
+    console.log(data);
+    try {
+        await knex('ToDoGroup').insert({
+            GroupId: id,
+            Name: data.name,
+            UserId: userId
+        });
+    } catch (err) {
+        return null;
+    }
+}
+
 async function findItem(iid) {
     try {
         let item = await knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title', 'UserId as userid').from('ToDoItem').where({ ItemId: iid });
@@ -244,12 +294,21 @@ async function findUserByEmail(email) {
     }
 }
 
-async function findItems(id) {
+async function findItems(id, group, order) {
     try {
-        let items = knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title').from('ToDoItem').where({ UserId: id });
-        // items = await client.query(`select "Date" as date, "ItemId" as id, "Description" as description, "Title" as title from public."ToDoItem" where "ToDoItem"."UserId" = '${id}'`);
+        let items;
+        if (order == 'default') {
+            items = await knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title').from('ToDoItem').where({GroupId: group});
+        } else {
+            items = await knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title').from('ToDoItem').where({GroupId: group}).orderBy(order, 'asc');
+        }
+        console.log(items);
         return items;
     } catch (err) {
         return null;
     }
+}
+
+function properOrderInput(input) {
+    return (input != 'default' || input != 'Date' || input != 'Title');
 }

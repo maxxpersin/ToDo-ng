@@ -1,0 +1,5 @@
+div.card-header {
+    display:flex;
+    place-content: end space-between;
+    align-items: center;
+}

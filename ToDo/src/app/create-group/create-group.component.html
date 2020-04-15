@@ -1,0 +1,21 @@
+<app-nav-bar></app-nav-bar>
+<div class="container">
+    <div class="card w-50 mx-auto">
+        <div class="card-header">
+            <h1>
+                Create new group
+            </h1>
+        </div>
+        <div class="card-body">
+            <form [formGroup]="groupForm" (ngSubmit)="onSubmit()">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input class="form-control" type="text" formControlName="name">
+                </div>
+                <button type="submit" class="btn btn-primary">Create</button>
+                <button [routerLink]="['/']" class="btn btn-warning">Cancel</button>
+            </form>
+        </div>
+    </div>
+    <div *ngIf="showError" class="alert alert-danger w-50 mx-auto">Please complete the form before submitting</div>
+</div>

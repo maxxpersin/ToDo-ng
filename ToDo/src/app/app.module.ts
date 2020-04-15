@@ -12,6 +12,8 @@ import { ItemViewComponent } from './item-view/item-view.component';
 import { RegisterComponent } from './register/register.component';
 import { LoginComponent } from './login/login.component';
 import { ToastrModule } from 'ngx-toastr';
+import { ListGroupComponent } from './list-group/list-group.component';
+import { CreateGroupComponent } from './create-group/create-group.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +23,9 @@ import { ToastrModule } from 'ngx-toastr';
     CreateTodoComponent,
     ItemViewComponent,
     RegisterComponent,
-    LoginComponent
+    LoginComponent,
+    ListGroupComponent,
+    CreateGroupComponent
   ],
   imports: [
     BrowserModule,

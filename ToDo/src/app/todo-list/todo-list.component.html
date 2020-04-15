@@ -6,10 +6,10 @@
             <span>
                 <form>
                     <label for="order" class="form-label">Order</label>
-                    <select id="order" class="form-control">
+                    <select id="order" #order class="form-control" (change)="updateTable(order.value)">
                         <option value="default">Date added</option>
-                        <option value="date">Completion date</option>
-                        <option value="title">Title</option>
+                        <option value="Date">Completion date</option>
+                        <option value="Title">Title</option>
                     </select>
                 </form>
                 <button [routerLink]="['/create-todo']" class="btn btn-primary" id="create-item">

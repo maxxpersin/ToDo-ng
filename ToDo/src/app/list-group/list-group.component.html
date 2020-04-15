@@ -11,12 +11,10 @@
             </div>
             <div *ngIf="groups.length > 0" class="inner">
                 <div [routerLink]="['/group/', group.groupId]" class="card" *ngFor="let group of groups">
-                    <div class="card-header">
-                        <h2>{{ group.name }}</h2>
-                    </div>
                     <div class="card-body">
-                        <ol>
-                           <li *ngFor="let item of group.items">{{ item.title }}</li> 
+                        <h2>{{ group.name }}</h2>
+                        <ol class="list-group list-group-flush">
+                            <li class="list-group-item " *ngFor="let item of group.items">{{ item.title }}</li>
                         </ol>
                     </div>
                 </div>

@@ -3,6 +3,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ApiService } from '../_services/api/api.service';
 import { AuthenticationService } from '../_services/authentication-service/authentication.service';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-create-group',
@@ -17,7 +18,11 @@ export class CreateGroupComponent implements OnInit {
 
   showError = false;
 
-  constructor(private api: ApiService, private authentication: AuthenticationService, private router: Router) { }
+  constructor(
+    private api: ApiService,
+    private authentication: AuthenticationService,
+    private router: Router,
+    private toastr: ToastrService) { }
 
   ngOnInit(): void {
   }
@@ -29,7 +34,8 @@ export class CreateGroupComponent implements OnInit {
         .subscribe(
           data => {
             this.router.navigate(['/']);
-          }, error => {}
+            this.toastr.success('Group created')
+          }, error => { this.toastr.error('Group could not be created'); }
         )
       this.router.navigate(['/']);
     } else {

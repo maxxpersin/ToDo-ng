@@ -8,6 +8,7 @@ div.inner {
     display: flex;
     justify-items: auto;
     align-items: flex-start;
+    flex-wrap: wrap;
 }
 
 div.inner>div {

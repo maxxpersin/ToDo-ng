@@ -3,9 +3,19 @@
     <div class="card">
         <div class="card-header">
             <h1 style="display: inline;">Your items</h1>
-            <button [routerLink]="['/create-todo']" class="btn btn-primary" id="create-item">
-                Create New ToDo
-            </button>
+            <span>
+                <form>
+                    <label for="order" class="form-label">Order</label>
+                    <select id="order" class="form-control">
+                        <option value="default">Date added</option>
+                        <option value="date">Completion date</option>
+                        <option value="title">Title</option>
+                    </select>
+                </form>
+                <button [routerLink]="['/create-todo']" class="btn btn-primary" id="create-item">
+                    Create New ToDo
+                </button>
+            </span>
         </div>
         <div class="card-body">
             <p *ngIf="toDoItems.length == 0">You have nothing to do!</p>

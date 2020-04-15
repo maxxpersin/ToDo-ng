@@ -5,11 +5,25 @@ div.container {
 div.card-header{
     display:flex;
     place-content: end space-between;
-    vertical-align: middle;
+    align-items: center;
 }
 
 button {
     height: 100%;
     position: relative;
-    top: 7px;
+}
+
+form {
+    display: flex;
+    align-items: baseline;
+    margin-right: 2em;
+}
+
+form > label{
+    position: relative;
+    right: 10%;
+}
+
+span {
+    display: flex;
 }

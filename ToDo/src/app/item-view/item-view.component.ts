@@ -48,12 +48,12 @@ export class ItemViewComponent implements OnInit {
   }
 
   deleteItem(item: ToDoItem) {
-    this.api.deleteItem(item.id)
+    this.api.deleteItem(this.gid, item.id)
       .subscribe(
         data => {
           console.log(data, 'success');
           this.toastr.success('Item deleted');
-          this.router.navigate(['/']);
+          this.router.navigate([`/group/${this.gid}`]);
         },
         error => {
           console.log(error, 'error');

@@ -43,7 +43,7 @@ export class ApiService {
     return this.http.get<any>(`${this.config}/${this.authenticationService.currentUserValue.id}/groups/${gid}/items/${iid}`);
   }
 
-  deleteItem(iid: string): Observable<any> {
-    return this.http.delete<any>(`${this.config}/items/${this.authenticationService.currentUserValue.id}/${iid}`);
+  deleteItem(gid: string, iid: string): Observable<any> {
+    return this.http.delete<any>(`${this.config}/${this.authenticationService.currentUserValue.id}/groups/${gid}/items/${iid}`);
   }
 }

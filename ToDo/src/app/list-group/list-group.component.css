@@ -6,16 +6,19 @@
 
 div.inner {
     display: flex;
-    justify-items: auto;
     align-items: flex-start;
     flex-wrap: wrap;
 }
 
 div.inner>div {
-    width: 25%;
     cursor: pointer;
 }
 
 h2 {
     font-size: 1.5em;
+}
+
+div.group-container {
+    width: 30%;
+    margin: 0 1em 0 1em;
 }

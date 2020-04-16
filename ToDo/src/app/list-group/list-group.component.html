@@ -10,7 +10,7 @@
                 You have no groups!
             </div>
             <div *ngIf="groups.length > 0" class="inner">
-                <div [routerLink]="['/group/', group.groupId]" class="card" *ngFor="let group of groups">
+                <div [routerLink]="['/group/', group.groupId]" class="group-container" *ngFor="let group of groups">
                     <div class="card-body">
                         <h2>{{ group.name }}</h2>
                         <ol class="list-group list-group-flush">

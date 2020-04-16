@@ -1,13 +1,3 @@
-// const PostgresClient = require('pg').Client;
-// const client = new PostgresClient({
-//     user: 'postgres',
-//     password: 'admin',
-//     host: 'localhost',
-//     port: 5432,
-//     database: 'todo'
-// });
-// client.connect(err => { if (err) console.log('Could not connect', err); });
-
 const knex = require('knex')({
     client: 'pg',
     connection: {

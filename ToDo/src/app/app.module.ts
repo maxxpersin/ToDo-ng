@@ -33,7 +33,7 @@ import { CreateGroupComponent } from './create-group/create-group.component';
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    ToastrModule.forRoot({ positionClass: 'toast-top-left' })
+    ToastrModule.forRoot({ positionClass: 'toast-bottom-right' })
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -127,7 +127,6 @@ app.get('/api/v1/items/:uid', async (req, res) => {
             req.query.order = 'default';
         }
         let userItems = await findItems(req.params.uid, req.query.group, req.query.order);
-        console.log(userItems);
         if (userItems == 'null') {
             return res.sendStatus(403);
         }
@@ -169,13 +168,9 @@ app.delete('/api/v1/:uid/groups/:gid/items/:iid', async (req, res) => {
         if (item == null) {
             return res.status(200).send();
         }
+        await deleteItem(item.id);
+        return res.status(200).send();
 
-        if (item.userid != req.params.uid) {
-            return res.status(403).send();
-        } else {
-            await deleteItem(item.id);
-            return res.status(200).send();
-        }
     } else {
         return res.status(403).send();
     }
@@ -293,9 +288,9 @@ async function findItems(id, group, order) {
     try {
         let items;
         if (order == 'default') {
-            items = await knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title').from('ToDoItem').where({GroupId: group});
+            items = await knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title').from('ToDoItem').where({ GroupId: group });
         } else {
-            items = await knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title').from('ToDoItem').where({GroupId: group}).orderBy(order, 'asc');
+            items = await knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title').from('ToDoItem').where({ GroupId: group }).orderBy(order, 'asc');
         }
         console.log(items);
         return items;

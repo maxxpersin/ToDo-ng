@@ -21,7 +21,9 @@ export class ListGroupComponent implements OnInit {
           this.groups = data;
           this.getItemsOfGroups(this.groups);
         }, error => {
-          console.log(error);
+          if (error.statusCode > 400) {
+            this.authenticationService.logout();
+          };
         }
       );
   }
@@ -34,7 +36,9 @@ export class ListGroupComponent implements OnInit {
             console.log(data);
             group.items = data;
           }, error => {
-            console.log(error);
+            if (error.statusCode > 400) {
+              this.authenticationService.logout();
+            }
           }
         )
     });

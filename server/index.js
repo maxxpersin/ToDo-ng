@@ -83,9 +83,11 @@ app.post('/api/v1/login', async (req, res) => {
 
         await knex('Session').insert({
             SessionId: cleanUser.sessionId,
-            Expiration: Date.now().toString(),
+            Expiration: (Date.now() + (1000 * 60 * 10)).toString(),
             UserId: cleanUser.id
         });
+
+        res.cookie('session-id', cleanUser.sessionId, { httpOnly: true });
 
         return res.json(cleanUser);
     } else {
@@ -100,7 +102,7 @@ app.post('/api/v1/logout', async (req, res) => {
 });
 
 app.get('/api/v1/groups/:uid', async (req, res) => {
-    if (validSession('', req.params.uid)) {
+    if (await validSession(req.params.uid, req.cookies['session-id'])) {
         let groups = await findGroups(req.params.uid);
         if (!groups) {
             return res.status(500).send();
@@ -112,7 +114,7 @@ app.get('/api/v1/groups/:uid', async (req, res) => {
 });
 
 app.post('/api/v1/groups/:uid', async (req, res) => {
-    if (validSession('', req.params.uid)) {
+    if (await validSession(req.params.uid, req.cookies['session-id'])) {
         await createGroup(req.params.uid, req.body);
         return res.status(200).send();
     } else {
@@ -122,7 +124,7 @@ app.post('/api/v1/groups/:uid', async (req, res) => {
 });
 
 app.get('/api/v1/items/:uid', async (req, res) => {
-    if (validSession('', req.params.uid)) {
+    if (await validSession(req.params.uid, req.cookies['session-id'])) {
         if (!req.query.order || !properOrderInput(req.query.order)) {
             req.query.order = 'default';
         }
@@ -138,7 +140,7 @@ app.get('/api/v1/items/:uid', async (req, res) => {
 });
 
 app.post('/api/v1/:uid/groups/:gid/items', async (req, res) => {
-    if (validSession('', req.params.uid)) {
+    if (await validSession(req.params.uid, req.cookies['session-id'])) {
         let item = req.body;
         let err = await createItem(item);
         if (err) return res.json(err);
@@ -150,12 +152,11 @@ app.post('/api/v1/:uid/groups/:gid/items', async (req, res) => {
 });
 
 app.get('/api/v1/:uid/groups/:gid/items/:iid', async (req, res) => {
-    if (validSession('', req.params.uid)) {
+    if (await validSession(req.params.uid, req.cookies['session-id'])) {
         let item = await findItem(req.params.iid);
         if (item == null) {
             return res.status(500).send();
         }
-        console.log(item);
         return res.json(item);
     } else {
         return res.status(403).send();
@@ -163,7 +164,7 @@ app.get('/api/v1/:uid/groups/:gid/items/:iid', async (req, res) => {
 });
 
 app.delete('/api/v1/:uid/groups/:gid/items/:iid', async (req, res) => {
-    if (validSession('', req.params.uid)) {
+    if (await validSession(req.params.uid, req.cookies['session-id'])) {
         let item = await findItem(req.params.iid);
         if (item == null) {
             return res.status(200).send();
@@ -178,7 +179,9 @@ app.delete('/api/v1/:uid/groups/:gid/items/:iid', async (req, res) => {
 
 async function findGroups(userId) {
     try {
-        let groups = await knex.select('GroupId as groupId', 'Name as name').from('ToDoGroup').where({ UserId: userId });
+        let groups = await knex.select('GroupId as groupId', 'Name as name')
+            .from('ToDoGroup')
+            .where({ UserId: userId });
         return groups
     } catch (err) {
         return null;
@@ -194,8 +197,34 @@ async function deleteItem(iid) {
     }
 }
 
-function validSession(sessionId, userId) {
-    return true;
+async function updateSession(session) {
+    try {
+        await knex('Session').where({ SessionId: session.sessionId })
+            .update({ Expiration: (Date.now() + (1000 * 60 * 10)).toString() });
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+async function validSession(userId, cookie) {
+    try {
+        let session = await knex.select('SessionId as sessionId', 'Expiration as expiration')
+            .from('Session')
+            .where({ UserId: userId });
+
+        if (!session[0] || session[0].sessionId != cookie) { //No cookie match
+            return false;
+        }
+
+        let pass = Date(session[0].expiration) < Date.now() ? false : true;
+        if (pass) {
+            await updateSession(session[0]);
+        }
+        return pass;
+    } catch (err) {
+        console.log(err);
+        return false;
+    }
 }
 
 async function createUser(data) {
@@ -217,7 +246,6 @@ async function createUser(data) {
 }
 
 async function createItem(data) {
-    console.log(data, ' created data');
     let id = shortId.generate();
     try {
         await knex('ToDoItem').insert({
@@ -231,14 +259,12 @@ async function createItem(data) {
         //     "ItemId", "Description", "Title", "Date", "UserId")
         //     VALUES ('${id}', '${data.description}', '${data.title}', '${data.date}', '${userId}');`);
     } catch (err) {
-        console.log(err);
         return null;
     }
 }
 
 async function createGroup(userId, data) {
     let id = shortId.generate();
-    console.log(data);
     try {
         await knex('ToDoGroup').insert({
             GroupId: id,
@@ -275,10 +301,7 @@ function findUser(uid) {
 async function findUserByEmail(email) {
     try {
         let user = await knex.select().from('User').where({ Email: email });
-        //console.log(user);
         return user[0];
-        //user = await client.query(`select * from public."User" where "User"."Email" = '${email}'`);
-        //return user.rows[0];
     } catch (err) {
         return null;
     }
@@ -292,7 +315,6 @@ async function findItems(id, group, order) {
         } else {
             items = await knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title').from('ToDoItem').where({ GroupId: group }).orderBy(order, 'asc');
         }
-        console.log(items);
         return items;
     } catch (err) {
         return null;

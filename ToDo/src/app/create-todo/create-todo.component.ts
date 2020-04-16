@@ -4,6 +4,7 @@ import { ApiService } from '../_services/api/api.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { AuthenticationService } from '../_services/authentication-service/authentication.service';
 
 @Component({
   selector: 'app-create-todo',
@@ -22,7 +23,7 @@ export class CreateTodoComponent implements OnInit {
   showError = false;
   submitted = false;
 
-  constructor(private api: ApiService, private router: Router, private toastr: ToastrService, private route: ActivatedRoute) { }
+  constructor(private api: ApiService, private authenticationService: AuthenticationService, private router: Router, private toastr: ToastrService, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
 
@@ -37,7 +38,9 @@ export class CreateTodoComponent implements OnInit {
             this.router.navigate([`group/${this.route.snapshot.paramMap.get('gid')}`]);
           },
           error => {
-            console.log(error);
+            if (error.statusCode > 400) {
+              this.authenticationService.logout();
+            }
           }
         );
     } else {

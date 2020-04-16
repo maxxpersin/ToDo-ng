@@ -35,7 +35,9 @@ export class TodoListComponent implements OnInit {
           this.toDoItems = data;
           this.formatDate(this.toDoItems);
         }, error => {
-          console.log(error);
+          if (error.statusCode > 400) {
+            this.authenticationService.logout();
+          }
         }
       );
   }
@@ -47,7 +49,9 @@ export class TodoListComponent implements OnInit {
           this.toDoItems = data;
           this.formatDate(this.toDoItems);
         }, error => {
-          console.log(error);
+          if (error.statusCode > 400) {
+            this.authenticationService.logout();
+          }
         }
       )
   }

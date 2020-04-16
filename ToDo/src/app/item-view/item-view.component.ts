@@ -4,6 +4,7 @@ import { ToDoItem } from '../_models/to-do-item/to-do-item';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { AuthenticationService } from '../_services/authentication-service/authentication.service';
 
 @Component({
   selector: 'app-item-view',
@@ -23,7 +24,7 @@ export class ItemViewComponent implements OnInit {
     description: new FormControl('', [Validators.required])
   });
 
-  constructor(private api: ApiService, private route: ActivatedRoute, private router: Router, private toastr: ToastrService) { }
+  constructor(private api: ApiService, private route: ActivatedRoute, private authenticationService: AuthenticationService, private router: Router, private toastr: ToastrService) { }
 
   ngOnInit(): void {
     this.id = this.route.snapshot.paramMap.get('id');
@@ -38,7 +39,9 @@ export class ItemViewComponent implements OnInit {
           //this.editToDoForm.setValue({ title: this.item.title, date: this.item.date, description: this.item.description });
         },
         error => {
-          console.log(error);
+          if (error.statusCode > 400) {
+            this.authenticationService.logout();
+          }
         }
       );
   }

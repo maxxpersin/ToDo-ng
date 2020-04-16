@@ -39,7 +39,7 @@ export class ItemViewComponent implements OnInit {
           //this.editToDoForm.setValue({ title: this.item.title, date: this.item.date, description: this.item.description });
         },
         error => {
-          if (error.statusCode > 400) {
+          if (error.status > 400) {
             this.authenticationService.logout();
           }
         }

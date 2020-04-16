@@ -23,6 +23,8 @@ export class CreateTodoComponent implements OnInit {
   showError = false;
   submitted = false;
 
+  gid = this.route.snapshot.paramMap.get('gid');
+
   constructor(private api: ApiService, private authenticationService: AuthenticationService, private router: Router, private toastr: ToastrService, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
@@ -35,10 +37,10 @@ export class CreateTodoComponent implements OnInit {
         .subscribe(
           data => {
             this.toastr.success('Item created');
-            this.router.navigate([`group/${this.route.snapshot.paramMap.get('gid')}`]);
+            this.router.navigate([`group/${this.gid}`]);
           },
           error => {
-            if (error.statusCode > 400) {
+            if (error.status > 400) {
               this.authenticationService.logout();
             }
           }

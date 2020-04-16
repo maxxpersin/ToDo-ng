@@ -21,7 +21,7 @@ export class ListGroupComponent implements OnInit {
           this.groups = data;
           this.getItemsOfGroups(this.groups);
         }, error => {
-          if (error.statusCode > 400) {
+          if (error.status > 400) {
             this.authenticationService.logout();
           };
         }
@@ -33,10 +33,9 @@ export class ListGroupComponent implements OnInit {
       this.api.getItems(this.authenticationService.currentUserValue.id, group.groupId, 'default')
         .subscribe(
           data => {
-            console.log(data);
             group.items = data;
           }, error => {
-            if (error.statusCode > 400) {
+            if (error.status > 400) {
               this.authenticationService.logout();
             }
           }

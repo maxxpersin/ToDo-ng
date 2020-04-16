@@ -27,16 +27,15 @@ export class AuthenticationService {
     this.http.post<any>(`${this.route}/logout`, this.currentUserValue)
       .subscribe(
         data => {
-          console.log(data);
+          this.currentUserSubject.next(null);
+          localStorage.removeItem('user');
+          this.router.navigate(['/login']);
         },
         error => {
           console.log(error);
         }
       );
-    console.log(this.currentUserValue);
-    this.currentUserSubject.next(null);
-    localStorage.removeItem('user');
-    this.router.navigate(['/login']);
+
   }
 
   public get currentUserValue() {

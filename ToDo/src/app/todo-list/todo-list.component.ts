@@ -6,6 +6,7 @@ import { User } from '../_models/user/user';
 import { Router, ActivatedRoute } from '@angular/router';
 import { NavBarComponent } from '../nav-bar/nav-bar.component';
 import { AuthenticationService } from '../_services/authentication-service/authentication.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-todo-list',
@@ -17,7 +18,7 @@ export class TodoListComponent implements OnInit {
   toDoItems: ToDoItem[] = [];
   groupId: string;
 
-  constructor(private api: ApiService, private authenticationService: AuthenticationService, private router: Router, private route: ActivatedRoute) { }
+  constructor(private api: ApiService, private authenticationService: AuthenticationService, private toastr: ToastrService, private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
     this.groupId = this.route.snapshot.paramMap.get('gid');
@@ -35,7 +36,7 @@ export class TodoListComponent implements OnInit {
           this.toDoItems = data;
           this.formatDate(this.toDoItems);
         }, error => {
-          if (error.statusCode > 400) {
+          if (error.status > 400) {
             this.authenticationService.logout();
           }
         }
@@ -49,7 +50,7 @@ export class TodoListComponent implements OnInit {
           this.toDoItems = data;
           this.formatDate(this.toDoItems);
         }, error => {
-          if (error.statusCode > 400) {
+          if (error.status > 400) {
             this.authenticationService.logout();
           }
         }
@@ -69,5 +70,15 @@ export class TodoListComponent implements OnInit {
 
   toItemView(iid: string) {
     this.router.navigate([`group/${this.groupId}/item/view/${iid}`]);
+  }
+
+  deleteGroup() {
+    this.api.deleteGroup(this.groupId)
+      .subscribe(
+        data => { 
+          this.toastr.success('Group successfully deleted');
+          this.router.navigate(['/']);
+        }, error => { if (error.status > 400) this.authenticationService.logout() }
+      );
   }
 }

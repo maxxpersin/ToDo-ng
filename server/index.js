@@ -177,6 +177,16 @@ app.delete('/api/v1/:uid/groups/:gid/items/:iid', async (req, res) => {
     }
 });
 
+app.delete('/api/v1/:uid/groups/:gid', async (req, res) => {
+    if (await validSession(req.params.uid, req.cookies['session-id'])) {
+        await deleteGroup(req.params.gid);
+
+        return res.status(200).send();
+    } else {
+        return res.status(403).send();
+    }
+});
+
 async function findGroups(userId) {
     try {
         let groups = await knex.select('GroupId as groupId', 'Name as name')
@@ -278,7 +288,8 @@ async function createGroup(userId, data) {
 
 async function findItem(iid) {
     try {
-        let item = await knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title', 'GroupId as groupId').from('ToDoItem').where({ ItemId: iid });
+        let item = await knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title', 'GroupId as groupId')
+            .from('ToDoItem').where({ ItemId: iid });
         //let item = await client.query(`select "Date" as date, "ItemId" as id, "Description" as description, "Title" as title, "UserId" as userid from public."ToDoItem" where "ToDoItem"."ItemId" = '${iid}'`);
         return item[0];
     } catch (err) {
@@ -286,16 +297,15 @@ async function findItem(iid) {
     }
 }
 
-function findUser(uid) {
-    let found;
-    users.forEach(user => {
-        if (user.id == uid) {
-            found = user;
-            return;
-        }
-    });
-
-    return found;
+async function deleteGroup(gid) {
+    try {
+        await knex('ToDoGroup')
+            .join('ToDoItem', 'ToDoGroup.GroupId', '=', 'ToDoItem.GroupId')
+            .where('ToDoGroup.GroupId', '=', `${gid}`)
+            .del();
+    } catch (err) {
+        console.log(err);
+    }
 }
 
 async function findUserByEmail(email) {

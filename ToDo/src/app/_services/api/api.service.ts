@@ -36,7 +36,7 @@ export class ApiService {
   }
 
   createNewItem(formData: any): Observable<any> {
-    return this.http.post<any>(`${this.config}/${this.authenticationService.currentUserValue}/groups/${formData.groupId}/items`, formData);
+    return this.http.post<any>(`${this.config}/${this.authenticationService.currentUserValue.id}/groups/${formData.groupId}/items`, formData);
   }
 
   getItem(gid: string, iid: string): Observable<any> {
@@ -45,5 +45,9 @@ export class ApiService {
 
   deleteItem(gid: string, iid: string): Observable<any> {
     return this.http.delete<any>(`${this.config}/${this.authenticationService.currentUserValue.id}/groups/${gid}/items/${iid}`);
+  }
+
+  deleteGroup(gid: string): Observable<any> {
+    return this.http.delete<any>(`${this.config}/${this.authenticationService.currentUserValue.id}/groups/${gid}`);
   }
 }

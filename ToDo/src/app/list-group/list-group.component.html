@@ -3,7 +3,13 @@
     <div class="card" id="main">
         <div class="card-header">
             <h1>Your Groups</h1>
-            <button [routerLink]="['/create-group']" class="btn btn-primary">New Group</button>
+            <div class="options">
+                <div class="form-check form-check-inline">
+                    <input type="checkbox" [(ngModel)]="isChecked" (change)="updateGroups(isChecked ? true : false)" id="show-empty" class="form-check-input">
+                    <label for="show-empty" class="form-check-label">Show Empty Groups</label>
+                </div>
+                <button [routerLink]="['/create-group']" class="btn btn-primary">New Group</button>
+            </div>
         </div>
         <div class="card-body">
             <div *ngIf="groups.length == 0">

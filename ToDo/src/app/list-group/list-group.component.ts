@@ -11,10 +11,30 @@ import { Router } from '@angular/router';
 export class ListGroupComponent implements OnInit {
 
   groups = [];
+  isChecked = true;
 
   constructor(private api: ApiService, private authenticationService: AuthenticationService, private router: Router) { }
 
   ngOnInit(): void {
+    this.getGroups();
+  }
+
+  getItemsOfGroups(groups: any) {
+    groups.forEach(group => {
+      this.api.getItems(this.authenticationService.currentUserValue.id, group.groupId, 'default')
+        .subscribe(
+          data => {
+            group.items = data;
+          }, error => {
+            if (error.status > 400) {
+              this.authenticationService.logout();
+            }
+          }
+        )
+    });
+  }
+
+  getGroups() {
     this.api.getGroups(this.authenticationService.currentUserValue.id)
       .subscribe(
         data => {
@@ -28,19 +48,22 @@ export class ListGroupComponent implements OnInit {
       );
   }
 
-  getItemsOfGroups(groups) {
-    groups.forEach(group => {
-      this.api.getItems(this.authenticationService.currentUserValue.id, group.groupId, 'default')
+  updateGroups(evt: any) {
+    if (!evt) {
+      this.api.filterGroups()
         .subscribe(
           data => {
-            group.items = data;
+            this.groups = data;
+            this.getItemsOfGroups(this.groups);
           }, error => {
             if (error.status > 400) {
               this.authenticationService.logout();
             }
           }
-        )
-    });
+        );
+    } else {
+      this.getGroups();
+    }
   }
 
 }

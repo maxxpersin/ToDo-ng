@@ -1,5 +1,5 @@
 #main>div.card-header {
-    display:flex;
+    display: flex;
     place-content: end space-between;
     align-items: center;
 }
@@ -22,3 +22,10 @@ div.group-container {
     width: 30%;
     margin: 0 1em 0 1em;
 }
+
+div.options {
+    display: flex;
+    align-items: baseline;
+}
+
+div.options>* {}

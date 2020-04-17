@@ -103,7 +103,13 @@ app.post('/api/v1/logout', async (req, res) => {
 
 app.get('/api/v1/groups/:uid', async (req, res) => {
     if (await validSession(req.params.uid, req.cookies['session-id'])) {
-        let groups = await findGroups(req.params.uid);
+        let groups;
+        if (req.query.filter == 'true') {
+            groups = await findGroupsFilter(req.params.uid);
+        } else {
+            groups = await findGroups(req.params.uid);
+        }
+
         if (!groups) {
             return res.status(500).send();
         }
@@ -333,4 +339,20 @@ async function findItems(id, group, order) {
 
 function properOrderInput(input) {
     return (input != 'default' || input != 'Date' || input != 'Title');
+}
+
+async function findGroupsFilter(userId) {
+    try {
+        let groups = await knex.select('ToDoGroup.GroupId as groupId', 'ToDoGroup.Name as name')
+            .from('ToDoGroup')
+            .join('ToDoItem', 'ToDoGroup.GroupId', '=', 'ToDoItem.GroupId')
+            .groupBy('ToDoGroup.GroupId')
+            .orderBy('ToDoGroup.Name', 'asc')
+            .having(knex.raw('count("ToDoGroup"."GroupId") > 0'));
+
+        return groups;
+    } catch (err) {
+        console.log(err);
+        return null;
+    }
 }

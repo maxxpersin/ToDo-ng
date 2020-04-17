@@ -50,4 +50,8 @@ export class ApiService {
   deleteGroup(gid: string): Observable<any> {
     return this.http.delete<any>(`${this.config}/${this.authenticationService.currentUserValue.id}/groups/${gid}`);
   }
+
+  filterGroups(): Observable<any> {
+    return this.http.get<any>(`${this.config}/groups/${this.authenticationService.currentUserValue.id}?filter=true`)
+  }
 }

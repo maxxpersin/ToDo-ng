@@ -31,8 +31,8 @@ export class ApiService {
     return this.http.get<any>(`${this.config}/groups/${uid}`);
   }
 
-  getItems(uid: string, group: string, options: any): Observable<any> {
-    return this.http.get<any>(`${this.config}/items/${uid}?group=${group}&order=${options || 'default'}`);
+  getItems(uid: string, group: string, options: any, exclude: boolean): Observable<any> {
+    return this.http.get<any>(`${this.config}/items/${uid}?group=${group}&order=${options || 'default'}&hide-expired=${exclude}`);
   }
 
   createNewItem(formData: any): Observable<any> {

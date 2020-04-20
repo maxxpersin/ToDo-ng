@@ -7,6 +7,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { NavBarComponent } from '../nav-bar/nav-bar.component';
 import { AuthenticationService } from '../_services/authentication-service/authentication.service';
 import { ToastrService } from 'ngx-toastr';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-todo-list',
@@ -17,10 +18,18 @@ export class TodoListComponent implements OnInit {
 
   toDoItems: ToDoItem[] = [];
   groupId: string;
+  isChecked = true;
+  order = 'default';
 
-  constructor(private api: ApiService, private authenticationService: AuthenticationService, private toastr: ToastrService, private router: Router, private route: ActivatedRoute) { }
+  constructor(
+    private api: ApiService,
+    private authenticationService: AuthenticationService,
+    private toastr: ToastrService, private router: Router,
+    private route: ActivatedRoute,
+    private spinner: NgxSpinnerService) { }
 
   ngOnInit(): void {
+    this.spinner.show();
     this.groupId = this.route.snapshot.paramMap.get('gid');
     this.getToDoItems();
   }
@@ -30,11 +39,13 @@ export class TodoListComponent implements OnInit {
   }
 
   getToDoItems() {
-    this.api.getItems(this.authenticationService.currentUserValue.id, this.groupId, '')
+    this.spinner.show();
+    this.api.getItems(this.authenticationService.currentUserValue.id, this.groupId, '', !this.isChecked)
       .subscribe(
         data => {
           this.toDoItems = data;
           this.formatDate(this.toDoItems);
+          this.spinner.hide();
         }, error => {
           if (error.status > 400) {
             this.authenticationService.logout();
@@ -43,18 +54,20 @@ export class TodoListComponent implements OnInit {
       );
   }
 
-  updateTable(choice: any) {
-    this.api.getItems(this.authenticationService.currentUserValue.id, this.groupId, choice)
+  updateTable(display: any, choice: any) {
+    this.spinner.show();
+    this.api.getItems(this.authenticationService.currentUserValue.id, this.groupId, choice, !display)
       .subscribe(
         data => {
           this.toDoItems = data;
           this.formatDate(this.toDoItems);
+          this.spinner.hide();
         }, error => {
           if (error.status > 400) {
             this.authenticationService.logout();
           }
         }
-      )
+      );
   }
 
   formatDate(items: ToDoItem[]) {
@@ -75,7 +88,7 @@ export class TodoListComponent implements OnInit {
   deleteGroup() {
     this.api.deleteGroup(this.groupId)
       .subscribe(
-        data => { 
+        data => {
           this.toastr.success('Group successfully deleted');
           this.router.navigate(['/']);
         }, error => { if (error.status > 400) this.authenticationService.logout() }

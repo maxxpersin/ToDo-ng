@@ -134,8 +134,15 @@ app.get('/api/v1/items/:uid', async (req, res) => {
         if (!req.query.order || !properOrderInput(req.query.order)) {
             req.query.order = 'default';
         }
-        let userItems = await findItems(req.params.uid, req.query.group, req.query.order);
-        if (userItems == 'null') {
+
+        let userItems;
+        if (req.query['hide-expired'] == 'true') {
+            userItems = await findItemsExceptExpired(req.query.group, req.query.order);
+            userItems = userItems.rows;
+        } else {
+            userItems = await findItems(req.query.group, req.query.order);
+        }
+        if (userItems == null) {
             return res.sendStatus(403);
         }
 
@@ -275,6 +282,7 @@ async function createItem(data) {
         //     "ItemId", "Description", "Title", "Date", "UserId")
         //     VALUES ('${id}', '${data.description}', '${data.title}', '${data.date}', '${userId}');`);
     } catch (err) {
+        console.log(err);
         return null;
     }
 }
@@ -327,9 +335,9 @@ async function findItems(group, order) {
     try {
         let items;
         if (order == 'default') {
-            items = await knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title').from('ToDoItem').where({ GroupId: group });
+            items = await knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title').from('ToDoItem').where('GroupId', '=', `${group}`);
         } else {
-            items = await knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title').from('ToDoItem').where({ GroupId: group }).orderBy(order, 'asc');
+            items = await knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title').from('ToDoItem').where('GroupId', '=', `${group}`).orderBy(order, 'asc');
         }
         return items;
     } catch (err) {
@@ -358,29 +366,28 @@ async function findGroupsFilter(userId) {
 
 async function findItemsExceptExpired(groupId, order) {
     try {
-        let items;
         if (order == 'default') {
-            items = await knex.raw(
-                '? EXCEPT ? ',
-                [knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title')
+            return await knex.raw(
+                `? EXCEPT ? `,
+                [knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title', 'GroupId as groupId')
                     .from('ToDoItem')
-                    .where({ GroupId: group }),
-                knex.select('*')
+                    .where('GroupId', '=', `${groupId}`),
+                knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title', 'GroupId as groupId')
                     .from('ToDoItem')
-                    .where('ToDoItem.GroupId', '=', 'group', 'AND', 'ToDoItem.Date', '<', Date.now())]);
+                    .where('ToDoItem.Date', '<', Date.now())]);
         } else {
-            items = await knex.raw(
-                '? EXCEPT ? ',
-                [knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title')
+            return await knex.raw(
+                `? EXCEPT ? `,
+                [knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title', 'GroupId as groupId')
                     .from('ToDoItem')
-                    .where({ GroupId: group }),
-                knex.select('*')
+                    .where('GroupId', '=', `${groupId}`),
+                knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title', 'GroupId as groupId')
                     .from('ToDoItem')
-                    .where('ToDoItem.GroupId', '=', 'group', 'AND', 'ToDoItem.Date', '<', Date.now())
+                    .where('ToDoItem.Date', '<', Date.now())
                     .orderBy(order, 'asc')]);
+            
         }
     } catch (err) {
-        console.log(err);
         return null;
     }
 }

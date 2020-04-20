@@ -1,6 +1,7 @@
 <app-nav-bar></app-nav-bar>
 <div class="container">
     <div class="card" id="main">
+        
         <div class="card-header">
             <h1>Your Groups</h1>
             <div class="options">
@@ -12,7 +13,8 @@
             </div>
         </div>
         <div class="card-body">
-            <div *ngIf="groups.length == 0">
+            
+            <div *ngIf="groups.length == 0 && !showSpinner">
                 You have no groups!
             </div>
             <div *ngIf="groups.length > 0" class="inner">
@@ -26,5 +28,6 @@
                 </div>
             </div>
         </div>
+        <ngx-spinner [fullScreen]="false"></ngx-spinner>
     </div>
 </div>

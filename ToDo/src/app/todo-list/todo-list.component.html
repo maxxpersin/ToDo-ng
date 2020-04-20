@@ -3,19 +3,28 @@
     <div class="card">
         <div class="card-header">
             <h1 style="display: inline;">Your items</h1>
-            <span>
-                <form>
-                    <label for="order" class="form-label">Order</label>
-                    <select id="order" #order class="form-control" (change)="updateTable(order.value)">
-                        <option value="default">Date added</option>
-                        <option value="Date">Completion date</option>
-                        <option value="Title">Title</option>
-                    </select>
-                </form>
-                <button (click)="goToCreateToDo()" class="btn btn-primary" id="create-item">
-                    Create New ToDo
-                </button>
-            </span>
+            <div id="filters" class="form-group form-inline row">
+                <label for="exclude" class="form-check-label">Show Expired</label>
+                <div class="form-group form-inline">
+                    <input name="exclude" type="checkbox" class="form-check-input" [(ngModel)]="isChecked"
+                        (change)="updateTable(isChecked ? true : false, order)">
+                </div>
+                <label for="order" class="form-label">Order</label>
+                <div class="form-group form-inline">
+                    <div class="col">
+                        <select id="order" [(ngModel)]="order" class="form-control" (change)="updateTable(isChecked ? true : false, order)">
+                            <option value="default">Date added</option>
+                            <option value="Date">Completion date</option>
+                            <option value="Title">Title</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col">
+                    <button (click)="goToCreateToDo()" class="btn btn-primary" id="create-item">
+                        Create New ToDo
+                    </button>
+                </div>
+            </div>
         </div>
         <div class="card-body">
             <p *ngIf="toDoItems.length == 0">You have nothing to do!</p>
@@ -33,8 +42,10 @@
                 </tr>
             </table>
         </div>
+        <ngx-spinner [fullScreen]="false"></ngx-spinner>
     </div>
     <div>
-        <button (click)="deleteGroup()" style="margin-top: 30px;" class="btn btn-danger float-right">Delete Group</button>
+        <button (click)="deleteGroup()" style="margin-top: 30px;" class="btn btn-danger float-right">Delete
+            Group</button>
     </div>
 </div>

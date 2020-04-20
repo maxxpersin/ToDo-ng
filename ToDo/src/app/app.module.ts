@@ -14,6 +14,7 @@ import { LoginComponent } from './login/login.component';
 import { ToastrModule } from 'ngx-toastr';
 import { ListGroupComponent } from './list-group/list-group.component';
 import { CreateGroupComponent } from './create-group/create-group.component';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import { CreateGroupComponent } from './create-group/create-group.component';
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    ToastrModule.forRoot({ positionClass: 'toast-bottom-right' })
+    ToastrModule.forRoot({ positionClass: 'toast-bottom-right' }),
+    NgxSpinnerModule
   ],
   providers: [],
   bootstrap: [AppComponent]

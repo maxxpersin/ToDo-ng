@@ -11,6 +11,7 @@
             <h3>Description</h3>
             <p>{{item.description}}</p>
         </div>
+        <ngx-spinner [fullScreen]="false"></ngx-spinner>
     </div>
     <div *ngIf="edit" class="card w-50 mx-auto">
         <form [formGroup]="editToDoForm" (ngSubmit)="onSubmit()">

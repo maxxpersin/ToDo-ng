@@ -13,18 +13,7 @@ button {
     position: relative;
 }
 
-form {
+/* div#filters {
     display: flex;
-    align-items: baseline;
-    margin-right: 2em;
-}
-
-form > label{
-    position: relative;
-    right: 10%;
-}
-
-span {
-    display: flex;
-}
-
+    justify-content: space-between;
+} */

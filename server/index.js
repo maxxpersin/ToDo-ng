@@ -323,7 +323,7 @@ async function findUserByEmail(email) {
     }
 }
 
-async function findItems(id, group, order) {
+async function findItems(group, order) {
     try {
         let items;
         if (order == 'default') {
@@ -351,6 +351,34 @@ async function findGroupsFilter(userId) {
             .having(knex.raw('count("ToDoGroup"."GroupId") > 0'));
 
         return groups;
+    } catch (err) {
+        return null;
+    }
+}
+
+async function findItemsExceptExpired(groupId, order) {
+    try {
+        let items;
+        if (order == 'default') {
+            items = await knex.raw(
+                '? EXCEPT ? ',
+                [knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title')
+                    .from('ToDoItem')
+                    .where({ GroupId: group }),
+                knex.select('*')
+                    .from('ToDoItem')
+                    .where('ToDoItem.GroupId', '=', 'group', 'AND', 'ToDoItem.Date', '<', Date.now())]);
+        } else {
+            items = await knex.raw(
+                '? EXCEPT ? ',
+                [knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title')
+                    .from('ToDoItem')
+                    .where({ GroupId: group }),
+                knex.select('*')
+                    .from('ToDoItem')
+                    .where('ToDoItem.GroupId', '=', 'group', 'AND', 'ToDoItem.Date', '<', Date.now())
+                    .orderBy(order, 'asc')]);
+        }
     } catch (err) {
         console.log(err);
         return null;

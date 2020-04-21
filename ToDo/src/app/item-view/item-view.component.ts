@@ -20,16 +20,16 @@ export class ItemViewComponent implements OnInit {
   edit = false;
 
   editToDoForm = new FormGroup({
-    title: new FormControl('', [Validators.required]),
-    date: new FormControl('', [Validators.required]),
-    description: new FormControl('', [Validators.required])
+    title: new FormControl(),
+    date: new FormControl(),
+    description: new FormControl()
   });
 
   constructor(
-    private api: ApiService, 
-    private route: ActivatedRoute, 
-    private authenticationService: AuthenticationService, 
-    private router: Router, 
+    private api: ApiService,
+    private route: ActivatedRoute,
+    private authenticationService: AuthenticationService,
+    private router: Router,
     private toastr: ToastrService,
     private spinner: NgxSpinnerService) { }
 
@@ -61,23 +61,37 @@ export class ItemViewComponent implements OnInit {
     this.api.deleteItem(this.gid, item.id)
       .subscribe(
         data => {
-          console.log(data, 'success');
           this.toastr.success('Item deleted');
           this.router.navigate([`/group/${this.gid}`]);
         },
         error => {
-          console.log(error, 'error');
           this.toastr.error('Could not delete');
         }
       )
   }
 
   updateItem(item: ToDoItem) {
+    let itemToUpdate = new ToDoItem({
+      title: this.editToDoForm.value.title || item.title,
+      date: this.editToDoForm.value.date || item.date,
+      description: this.editToDoForm.value.description || item.description,
+      id: this.id,
+      groupId: this.gid
+    });
 
+    this.api.updateItem(itemToUpdate, this.gid, this.item.id)
+      .subscribe(
+        data => {
+          this.toastr.success('Edit successful');
+          this.router.navigate(['/group/', this.gid]);
+        }, error => {
+          this.toastr.error('Edit unsuccessful');
+        }
+      );
   }
 
   onSubmit() {
-
+    this.updateItem(this.item);
   }
 
 }

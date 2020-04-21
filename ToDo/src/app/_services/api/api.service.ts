@@ -39,6 +39,10 @@ export class ApiService {
     return this.http.post<any>(`${this.config}/${this.authenticationService.currentUserValue.id}/groups/${formData.groupId}/items`, formData);
   }
 
+  updateItem(item: ToDoItem, gid: string, iid: string): Observable<any> {
+    return this.http.put<any>(`${this.config}/${this.authenticationService.currentUserValue.id}/groups/${gid}/items/${iid}`, item);
+  }
+
   getItem(gid: string, iid: string): Observable<any> {
     return this.http.get<any>(`${this.config}/${this.authenticationService.currentUserValue.id}/groups/${gid}/items/${iid}`);
   }

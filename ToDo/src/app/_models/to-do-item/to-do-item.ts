@@ -9,7 +9,7 @@ export class ToDoItem {
         this.title = init.title;
         this.date = init.date;
         this.description = init.description;
-        this.id = '';
+        this.id = init.id;
         this.groupId = init.groupId;
     }
 }

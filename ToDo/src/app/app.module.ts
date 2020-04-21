@@ -15,6 +15,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { ListGroupComponent } from './list-group/list-group.component';
 import { CreateGroupComponent } from './create-group/create-group.component';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -35,7 +36,8 @@ import { NgxSpinnerModule } from 'ngx-spinner';
     ReactiveFormsModule,
     HttpClientModule,
     ToastrModule.forRoot({ positionClass: 'toast-bottom-right' }),
-    NgxSpinnerModule
+    NgxSpinnerModule,
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

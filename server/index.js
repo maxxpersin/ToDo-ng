@@ -176,6 +176,20 @@ app.get('/api/v1/:uid/groups/:gid/items/:iid', async (req, res) => {
     }
 });
 
+app.put('/api/v1/:uid/groups/:gid/items/:iid', async (req, res) => {
+    if (await validSession(req.params.uid, req.cookies['session-id'])) {
+        let err = await updateItem(req.body);
+
+        if (err) {
+            return res.status(500).send();
+        }
+
+        return res.status(200).send();
+    } else {
+        return res.status(403).send();
+    }
+});
+
 app.delete('/api/v1/:uid/groups/:gid/items/:iid', async (req, res) => {
     if (await validSession(req.params.uid, req.cookies['session-id'])) {
         let item = await findItem(req.params.iid);
@@ -311,6 +325,20 @@ async function findItem(iid) {
     }
 }
 
+async function updateItem(itemToUpdate) {
+    try {
+        await knex('ToDoItem')
+            .where({ ItemId: itemToUpdate.id })
+            .update({
+                Title: itemToUpdate.title,
+                Description: itemToUpdate.description,
+                Date: itemToUpdate.date
+            });
+    } catch (err) {
+        return err;
+    }
+}
+
 async function deleteGroup(gid) {
     try {
         await knex('ToDoGroup')
@@ -385,7 +413,7 @@ async function findItemsExceptExpired(groupId, order) {
                     .from('ToDoItem')
                     .where('ToDoItem.Date', '<', Date.now())
                     .orderBy(order, 'asc')]);
-            
+
         }
     } catch (err) {
         return null;

@@ -28,7 +28,7 @@ async function clearDB() {
     await knex.schema.dropTableIfExists('ToDoItem');
     await knex.schema.createTable('ToDoItem', table => {
         table.string('ItemId').primary();
-        table.string('Date');
+        table.date('Date');
         table.string('GroupId');
         table.string('Title');
         table.string('Description');

@@ -288,7 +288,7 @@ async function createItem(data) {
             ItemId: id,
             Description: data.description,
             Title: data.title,
-            Date: data.date,
+            Date: new Date(data.date),
             GroupId: data.groupId
         });
         // await client.query(`INSERT INTO public."ToDoItem"(
@@ -331,7 +331,7 @@ async function updateItem(itemToUpdate) {
             .update({
                 Title: itemToUpdate.title,
                 Description: itemToUpdate.description,
-                Date: itemToUpdate.date
+                Date: new Date(itemToUpdate.date)
             });
     } catch (err) {
         return err;
@@ -401,7 +401,7 @@ async function findItemsExceptExpired(groupId, order) {
                     .where('GroupId', '=', `${groupId}`),
                 knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title', 'GroupId as groupId')
                     .from('ToDoItem')
-                    .where('ToDoItem.Date', '<', Date.now())]);
+                    .where('ToDoItem.Date', '<', new Date().toISOString())]);
         } else {
             return await knex.raw(
                 `? EXCEPT ? `,
@@ -410,11 +410,12 @@ async function findItemsExceptExpired(groupId, order) {
                     .where('GroupId', '=', `${groupId}`),
                 knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title', 'GroupId as groupId')
                     .from('ToDoItem')
-                    .where('ToDoItem.Date', '<', Date.now())
+                    .where('ToDoItem.Date', '<', new Date().toISOString())
                     .orderBy(order, 'asc')]);
 
         }
     } catch (err) {
+        console.log(err);
         return null;
     }
 }

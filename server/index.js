@@ -134,7 +134,6 @@ app.get('/api/v1/items/:uid', async (req, res) => {
         if (!req.query.order || !properOrderInput(req.query.order)) {
             req.query.order = 'default';
         }
-
         let userItems;
         if (req.query['hide-expired'] == 'true') {
             userItems = await findItemsExceptExpired(req.query.group, req.query.order);

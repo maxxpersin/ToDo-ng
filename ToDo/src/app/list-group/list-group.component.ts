@@ -13,11 +13,10 @@ export class ListGroupComponent implements OnInit {
 
   groups = [];
   isChecked = true;
-  showSpinner = true;
 
   constructor(
-    private api: ApiService, 
-    private authenticationService: AuthenticationService, 
+    private api: ApiService,
+    private authenticationService: AuthenticationService,
     private router: Router,
     private spinner: NgxSpinnerService) { }
 
@@ -27,19 +26,23 @@ export class ListGroupComponent implements OnInit {
   }
 
   getItemsOfGroups(groups: any) {
-    groups.forEach(group => {
-      this.api.getItems(this.authenticationService.currentUserValue.id, group.groupId, 'default', false)
-        .subscribe(
-          data => {
-            group.items = data;
-            this.spinner.hide();
-          }, error => {
-            if (error.status > 400) {
-              this.authenticationService.logout();
+    if (groups.length > 0) {
+      groups.forEach(group => {
+        this.api.getItems(this.authenticationService.currentUserValue.id, group.groupId, 'default', false)
+          .subscribe(
+            data => {
+              group.items = data;
+              this.spinner.hide();
+            }, error => {
+              if (error.status > 400) {
+                this.authenticationService.logout();
+              }
             }
-          }
-        )
-    });
+          );
+      });
+    } else {
+      this.spinner.hide();
+    }
   }
 
   getGroups() {

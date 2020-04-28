@@ -33,6 +33,9 @@ export class CreateTodoComponent implements OnInit {
 
   onSubmit() {
     if (this.toDoForm.valid) {
+      let date = new Date(this.toDoForm.value.date);
+      date.setDate(date.getDate() + 1);
+      this.toDoForm.patchValue({ date: date });
       this.api.createNewItem(this.toDoForm.value)
         .subscribe(
           data => {

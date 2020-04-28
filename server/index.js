@@ -3,7 +3,6 @@ const app = express();
 const shortId = require('shortid');
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt');
-const bodyParser = require('body-parser');
 const knex = require('knex')({
     client: 'pg',
     connection: {
@@ -14,36 +13,6 @@ const knex = require('knex')({
     }
 });
 
-
-// db connection
-// const PostgresClient = require('pg').Client;
-// const client = new PostgresClient({
-//     user: 'postgres',
-//     password: 'admin',
-//     host: 'localhost',
-//     port: 5432,
-//     database: 'todo'
-// });
-// client.connect(err => {
-//     if (err) console.log('Could not connect', err);
-
-//     console.log('Postgres connection successful')
-// });
-
-// app.use(session({
-//     secret: 'sdapovin10832183csikjbasi',
-//     resave: true,
-//     saveUninitialized: false,
-//     cookie: {
-//         httpOnly: true,
-//         secure: false,
-//         sameSite: false,
-//         maxAge: 1000 * 15
-//     },
-//     name: 'session-id',
-//     rolling: true,
-// }));
-
 const port = 3000;
 
 app.listen(port, () => console.log('ToDo App listening on port 3000'));
@@ -51,13 +20,6 @@ app.listen(port, () => console.log('ToDo App listening on port 3000'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-//app.use(bodyParser());
-
-app.get('/', async (req, res) => {
-    return res.json(
-        await knex.select().from('User').where('Email', 'like', '%')
-    );
-});
 
 app.post('/api/v1/register', async (req, res) => {
     let user = await findUserByEmail(req.body.email);
@@ -97,7 +59,10 @@ app.post('/api/v1/login', async (req, res) => {
 
 app.post('/api/v1/logout', async (req, res) => {
     let user = req.body;
-    await knex('Session').where('SessionId', 'like', `${req.body.sessionId}`, 'and', 'UserId', 'like', `${req.body.id}`).del().catch(err => console.log(err));
+    await knex('Session')
+        .where('SessionId', 'like', `${req.body.sessionId}`, 'and', 'UserId', 'like', `${req.body.id}`)
+        .del()
+        .catch(err => console.log(err));
     return res.json('OK');
 });
 
@@ -226,8 +191,9 @@ async function findGroups(userId) {
 
 async function deleteItem(iid) {
     try {
-        await knex('ToDoItem').where({ ItemId: iid }).del();
-        // await client.query(`DELETE FROM public."ToDoItem" WHERE "ItemId" = '${iid}'`);
+        await knex('ToDoItem')
+                .where({ ItemId: iid })
+                .del();
     } catch (err) {
 
     }
@@ -235,8 +201,9 @@ async function deleteItem(iid) {
 
 async function updateSession(session) {
     try {
-        await knex('Session').where({ SessionId: session.sessionId })
-            .update({ Expiration: (Date.now() + (1000 * 60 * 10)).toString() });
+        await knex('Session')
+                .where({ SessionId: session.sessionId })
+                .update({ Expiration: (Date.now() + (1000 * 60 * 10)).toString() });
     } catch (err) {
         console.log(err);
     }
@@ -245,8 +212,8 @@ async function updateSession(session) {
 async function validSession(userId, cookie) {
     try {
         let session = await knex.select('SessionId as sessionId', 'Expiration as expiration')
-            .from('Session')
-            .where({ UserId: userId });
+                                .from('Session')
+                                .where({ UserId: userId });
 
         if (!session[0] || session[0].sessionId != cookie) { //No cookie match
             return false;
@@ -274,8 +241,6 @@ async function createUser(data) {
             Password: password,
             Email: data.email
         });
-        // await client.query(`INSERT INTO public."User"("UserId", "FirstName", "LastName", "Password", "Email")
-        // VALUES ('${id}', '${data.firstName}', '${data.lastName}', '${password}', '${data.email}');`);
     } catch (err) {
         return err;
     }
@@ -291,9 +256,6 @@ async function createItem(data) {
             Date: new Date(data.date),
             GroupId: data.groupId
         });
-        // await client.query(`INSERT INTO public."ToDoItem"(
-        //     "ItemId", "Description", "Title", "Date", "UserId")
-        //     VALUES ('${id}', '${data.description}', '${data.title}', '${data.date}', '${userId}');`);
     } catch (err) {
         console.log(err);
         return null;
@@ -316,8 +278,8 @@ async function createGroup(userId, data) {
 async function findItem(iid) {
     try {
         let item = await knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title', 'GroupId as groupId')
-            .from('ToDoItem').where({ ItemId: iid });
-        //let item = await client.query(`select "Date" as date, "ItemId" as id, "Description" as description, "Title" as title, "UserId" as userid from public."ToDoItem" where "ToDoItem"."ItemId" = '${iid}'`);
+                                .from('ToDoItem')
+                                .where({ ItemId: iid });
         return item[0];
     } catch (err) {
         return err;
@@ -351,20 +313,28 @@ async function deleteGroup(gid) {
 
 async function findUserByEmail(email) {
     try {
-        let user = await knex.select().from('User').where({ Email: email });
+        let user = await knex.select()
+                                .from('User')
+                                .where({ Email: email });
         return user[0];
     } catch (err) {
         return null;
     }
 }
 
+// ORDER BY QUERY
 async function findItems(group, order) {
     try {
         let items;
         if (order == 'default') {
-            items = await knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title').from('ToDoItem').where('GroupId', '=', `${group}`);
+            items = await knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title')
+                                .from('ToDoItem')
+                                .where('GroupId', '=', `${group}`);
         } else {
-            items = await knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title').from('ToDoItem').where('GroupId', '=', `${group}`).orderBy(order, 'asc');
+            items = await knex.select('Date as date', 'ItemId as id', 'Description as description', 'Title as title')
+                                .from('ToDoItem')
+                                .where('GroupId', '=', `${group}`)
+                                .orderBy(order, 'asc');
         }
         return items;
     } catch (err) {
@@ -376,6 +346,8 @@ function properOrderInput(input) {
     return (input != 'default' || input != 'Date' || input != 'Title');
 }
 
+
+// HAVING QUERY
 async function findGroupsFilter(userId) {
     try {
         let groups = await knex.select('ToDoGroup.GroupId as groupId', 'ToDoGroup.Name as name')
@@ -391,6 +363,7 @@ async function findGroupsFilter(userId) {
     }
 }
 
+// SET OPERATOR QUERY [? EXCEPT ?]
 async function findItemsExceptExpired(groupId, order) {
     try {
         if (order == 'default') {

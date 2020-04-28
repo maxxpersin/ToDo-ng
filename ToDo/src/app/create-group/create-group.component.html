@@ -13,9 +13,9 @@
                     <input class="form-control" type="text" formControlName="name">
                 </div>
                 <button type="submit" class="btn btn-primary">Create</button>
-                <button [routerLink]="['/']" class="btn btn-warning">Cancel</button>
+                <button [routerLink]="['/']" class="btn btn-warning float-right">Cancel</button>
             </form>
         </div>
     </div>
-    <div *ngIf="showError" class="alert alert-danger w-50 mx-auto">Please complete the form before submitting</div>
+    <div *ngIf="showError" style="margin-top: 2em;" class="alert alert-danger w-50 mx-auto">Please complete the form before submitting</div>
 </div>

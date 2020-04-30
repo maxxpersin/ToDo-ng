@@ -21,6 +21,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+app.use(express.static('public'));
+
 app.post('/api/v1/register', async (req, res) => {
     let user = await findUserByEmail(req.body.email);
     if (user) {
@@ -177,6 +179,14 @@ app.delete('/api/v1/:uid/groups/:gid', async (req, res) => {
         return res.status(403).send();
     }
 });
+
+// app.get('/', (req, res) => {
+//     return res.redirect('/');
+// });
+
+// app.get('/login', (req, res) => {
+//     return res.redirect('/');
+// })
 
 async function findGroups(userId) {
     try {

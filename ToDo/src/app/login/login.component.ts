@@ -33,7 +33,7 @@ export class LoginComponent implements OnInit {
         data => {
           this.authenticationService.currentUserSubject.next(data);
           localStorage.setItem('user', JSON.stringify(data));
-          this.router.navigate(['']);
+          this.router.navigate(['/']);
         },
         error => {
           this.showError();

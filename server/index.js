@@ -13,7 +13,7 @@ const knex = require('knex')({
     }
 });
 
-const port = 3000;
+const port = 80;
 
 app.listen(port, () => console.log('ToDo App listening on port 3000'));
 

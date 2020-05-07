@@ -356,6 +356,7 @@ async function findGroupsFilter(userId) {
         let groups = await knex.select('ToDoGroup.GroupId as groupId', 'ToDoGroup.Name as name')
             .from('ToDoGroup')
             .join('ToDoItem', 'ToDoGroup.GroupId', '=', 'ToDoItem.GroupId')
+            .where('ToDoGroup.UserId', '=', userId)
             .groupBy('ToDoGroup.GroupId')
             .orderBy('ToDoGroup.Name', 'asc')
             .having(knex.raw('count("ToDoGroup"."GroupId") > 0'));

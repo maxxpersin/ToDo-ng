@@ -15,7 +15,7 @@ const knex = require('knex')({
 
 const port = 80;
 
-app.listen(port, () => console.log('ToDo App listening on port 3000'));
+app.listen(port, () => console.log(`ToDo App listening on port ${port}`));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -180,13 +180,6 @@ app.delete('/api/v1/:uid/groups/:gid', async (req, res) => {
     }
 });
 
-// app.get('/', (req, res) => {
-//     return res.redirect('/');
-// });
-
-// app.get('/login', (req, res) => {
-//     return res.redirect('/');
-// })
 
 async function findGroups(userId) {
     try {
